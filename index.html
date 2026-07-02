@@ -141,6 +141,9 @@
   .hero-line{overflow:hidden}
   .hero p.lede{max-width:50ch;font-size:clamp(1.02rem,1.6vw,1.2rem);color:var(--mute);margin:32px 0 40px}
   .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .google-proof{display:inline-flex;align-items:center;gap:11px;margin-top:22px;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);transition:.2s}
+  .google-proof .stars{color:var(--yellow);letter-spacing:.08em;font-size:.82rem}
+  .google-proof:hover{color:var(--wash)}
 
   /* marquee */
   .marquee{margin-top:70px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap}
@@ -234,6 +237,19 @@
   .tm .ti .role{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--yellow);margin:9px 0 14px}
   .tm .ti p{color:var(--mute);font-size:.9rem}
 
+  /* ---------- reviews ---------- */
+  .reviews-panel{display:grid;grid-template-columns:.72fr 1.28fr;border:1px solid var(--line);background:var(--panel);margin-top:46px}
+  .google-score{background:var(--yellow);color:var(--ink);padding:44px;display:flex;flex-direction:column;justify-content:space-between;min-height:380px}
+  .google-label{font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  .score-number{font-family:var(--display);font-size:clamp(5rem,10vw,8.8rem);font-weight:800;letter-spacing:-.08em;line-height:.78}
+  .score-stars{font-size:1.25rem;letter-spacing:.14em;margin:20px 0 10px}
+  .score-count{font-family:var(--mono);font-size:.7rem;line-height:1.6;text-transform:uppercase;letter-spacing:.08em}
+  .review-card{padding:clamp(34px,6vw,72px);display:flex;flex-direction:column;justify-content:center}
+  .review-quote{font-family:var(--display);font-size:clamp(2rem,4.5vw,4.2rem);font-weight:700;line-height:1.02;letter-spacing:-.035em;max-width:18ch}
+  .review-quote em{color:var(--yellow);font-style:normal}
+  .review-by{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);margin-top:28px}
+  .review-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
+
   /* ---------- contact ---------- */
   .contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:60px;align-items:start}
   .ci-block .line{display:flex;flex-direction:column;gap:5px;margin-bottom:26px}
@@ -271,13 +287,15 @@
     .pd-spec .c:nth-child(2){border-right:none}
     .foot{grid-template-columns:1fr 1fr}
   }
-  @media(max-width:680px){
+  @media(max-width:1100px){
     .links{display:none;position:absolute;top:72px;left:0;right:0;flex-direction:column;background:rgba(14,15,17,.98);border-bottom:1px solid var(--line);padding:8px var(--gutter) 20px}
     .links.open{display:flex}
     .links a{padding:15px 0;border-bottom:1px solid var(--line-soft)}
     .links a.current{background:none;color:var(--yellow)}
     .navcta{display:none}
     .burger{display:block}
+  }
+  @media(max-width:680px){
     .svc{grid-template-columns:1fr;gap:14px;padding:30px 0}
     .svc .tags{justify-content:flex-start;max-width:none}
     .svc .sn{display:none}
@@ -286,6 +304,10 @@
     .marquee .track span{font-size:1.2rem}
     form{grid-template-columns:1fr}
     .foot{grid-template-columns:1fr}
+    .reviews-panel{grid-template-columns:1fr}
+    .google-score{min-height:260px;padding:32px}
+    .score-number{font-size:5.8rem}
+    .review-card{padding:36px 28px}
   }
   @media(prefers-reduced-motion:reduce){
     *{scroll-behavior:auto!important}
@@ -377,8 +399,9 @@
         <a href="#services" data-close><span class="n">03</span>Build</a>
         <a href="#projects" data-close><span class="n">04</span>Projects</a>
         <a href="#team" data-close><span class="n">05</span>Team</a>
-        <a href="#estimate" data-close><span class="n">06</span>Estimate</a>
-        <a href="#contact" data-close><span class="n">07</span>Contact</a>
+        <a href="#reviews" data-close><span class="n">06</span>Reviews</a>
+        <a href="#estimate" data-close><span class="n">07</span>Estimate</a>
+        <a href="#contact" data-close><span class="n">08</span>Contact</a>
       </div>
       <a href="#contact" class="navcta" data-close>Request a quote</a>
       <button class="burger" id="burger" aria-expanded="false" aria-controls="links">Menu</button>
@@ -404,7 +427,8 @@
         <a href="#projects" class="btn btn-y" data-close>View projects <span class="arr">→</span></a>
         <a href="#contact" class="btn btn-o" data-close>Start a build</a>
       </div>
-      <div class="marquee st" style="--i:4" aria-hidden="true">
+      <a href="#reviews" class="google-proof st" style="--i:4" data-close aria-label="View Axios Construction Google reviews"><span class="stars" aria-hidden="true">★★★★★</span><span>5.0 on Google · 1 review</span></a>
+      <div class="marquee st" style="--i:5" aria-hidden="true">
         <div class="track">
           <span>New Homes</span><span class="sep">◆</span><span>Renovations</span><span class="sep">◆</span><span>Extensions</span><span class="sep">◆</span><span>Commercial Fit-outs</span><span class="sep">◆</span><span>Duplexes</span><span class="sep">◆</span>
           <span>New Homes</span><span class="sep">◆</span><span>Renovations</span><span class="sep">◆</span><span>Extensions</span><span class="sep">◆</span><span>Commercial Fit-outs</span><span class="sep">◆</span><span>Duplexes</span><span class="sep">◆</span>
@@ -539,12 +563,43 @@
   </div></div>
 </section>
 
+<!-- ============ REVIEWS ============ -->
+<section class="view" id="view-reviews">
+  <div class="pad"><div class="wrap">
+    <div class="head st" style="--i:0">
+      <div>
+        <span class="kick"><span class="ix">[ 06 ]</span> Google reviews</span>
+        <h2 style="margin-top:18px">Built on trust.<br><em>Rated</em> by clients.</h2>
+      </div>
+      <p class="lede">Read verified client feedback on Google or share your own experience with Axios Construction.</p>
+    </div>
+    <div class="reviews-panel st" style="--i:1">
+      <div class="google-score">
+        <span class="google-label">Google rating</span>
+        <div>
+          <div class="score-number">5.0</div>
+          <div class="score-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <div class="score-count">1 public review<br>Checked 2 July 2026</div>
+        </div>
+      </div>
+      <article class="review-card">
+        <blockquote class="review-quote">“The entire process was <em>smooth, professional, and stress-free.</em>”</blockquote>
+        <p class="review-by">William Wu · 5-star Google review</p>
+        <div class="review-actions">
+          <a class="btn btn-y" href="https://www.google.com/maps?cid=7227826619345682489" target="_blank" rel="noopener noreferrer">Read on Google <span class="arr">↗</span></a>
+          <a class="btn btn-o" href="https://search.google.com/local/writereview?placeid=ChIJPayXOtehsy0ROUA2AARmTmQ" target="_blank" rel="noopener noreferrer">Leave a review <span class="arr">↗</span></a>
+        </div>
+      </article>
+    </div>
+  </div></div>
+</section>
+
 <!-- ============ ESTIMATE ============ -->
 <section class="view" id="view-estimate">
   <div class="pad"><div class="wrap">
     <div class="head st" style="--i:0">
       <div>
-        <span class="kick"><span class="ix">[ 06 ]</span> Ballpark estimator</span>
+        <span class="kick"><span class="ix">[ 07 ]</span> Ballpark estimator</span>
         <h2 style="margin-top:18px">Scope it.<br><em>Ballpark it.</em></h2>
       </div>
       <p class="lede">Pick the shape of your project for an illustrative indicative range. It is a starting point for discussion only — not a fixed quote.</p>
@@ -646,7 +701,7 @@
   <div class="pad"><div class="wrap">
     <div class="head st" style="--i:0">
       <div>
-        <span class="kick"><span class="ix">[ 07 ]</span> Start a build</span>
+        <span class="kick"><span class="ix">[ 08 ]</span> Start a build</span>
         <h2 style="margin-top:18px">Got a project?<br>Let's <em>scope it.</em></h2>
       </div>
     </div>
@@ -701,7 +756,7 @@
         <p>Construction services across Greater Sydney for new homes, renovations, extensions and commercial projects.</p>
       </div>
       <div><h4>Build</h4><a data-link="#services">New homes</a><a data-link="#services">Renovations</a><a data-link="#services">Extensions</a><a data-link="#services">Commercial</a></div>
-      <div><h4>Studio</h4><a data-link="#studio">About</a><a data-link="#projects">Projects</a><a data-link="#team">Team</a><a data-link="#contact">Contact</a></div>
+      <div><h4>Studio</h4><a data-link="#studio">About</a><a data-link="#projects">Projects</a><a data-link="#team">Team</a><a data-link="#reviews">Reviews</a></div>
       <div><h4>Get in touch</h4><a href="tel:+61417958871">0417 958 871</a><a href="mailto:info@axiosconstruction.com.au">info@axiosconstruction.com.au</a><a data-link="#contact">Request a quote</a></div>
     </div>
     <div class="fbot">
@@ -754,7 +809,7 @@
   }
 
   /* ---------- view router ---------- */
-  const VIEWS = ['home','studio','services','projects','project','team','estimate','contact','privacy'];
+  const VIEWS = ['home','studio','services','projects','project','team','reviews','estimate','contact','privacy'];
   const curtain = document.getElementById('curtain');
   const cmark = curtain.querySelector('.cmark');
   let current = null, busy = false;

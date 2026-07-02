@@ -27,4 +27,5 @@ Confirmed production domain: `axiosconstruction.com.au` (confirmed 2 July 2026).
 
 - Replace the portfolio placeholder with verified project copy and client-approved photography.
 - Add a real director photograph if desired.
+- Recheck the displayed Google rating and review count when new reviews arrive; the current values were verified on 2 July 2026.
 - Review the privacy notice whenever analytics, advertising or additional external services are added.
