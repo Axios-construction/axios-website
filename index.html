@@ -278,6 +278,19 @@
   .foot a{display:block;color:var(--mute);font-size:.9rem;margin-bottom:10px;transition:color .2s;cursor:pointer}
   .foot a:hover{color:var(--wash)}
   .fbot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:26px;font-family:var(--mono);font-size:.72rem;color:var(--slate)}
+  .analytics-settings{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .analytics-settings:hover{color:var(--wash)}
+  .analytics-settings-toggle{position:fixed;opacity:0;pointer-events:none}
+
+  /* ---------- analytics consent ---------- */
+  .consent{position:fixed;left:var(--gutter);right:var(--gutter);bottom:22px;z-index:500;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;max-width:1180px;margin:0 auto;padding:24px 26px;background:var(--panel);border:1px solid var(--yellow);box-shadow:0 18px 60px rgba(0,0,0,.45)}
+  .consent[hidden]{display:none}
+  #analyticsSettingsToggle:checked ~ .consent[hidden]{display:grid}
+  .consent h2{font-family:var(--display);font-size:1.25rem;line-height:1.1;margin-bottom:7px}
+  .consent p{color:var(--mute);font-size:.9rem;max-width:72ch}
+  .consent p a{color:var(--yellow);text-decoration:underline}
+  .consent-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .consent .btn{padding:12px 18px;font-size:.7rem;white-space:nowrap}
 
   /* ---------- mobile ---------- */
   @media(max-width:1000px){
@@ -308,6 +321,8 @@
     .google-score{min-height:260px;padding:32px}
     .score-number{font-size:5.8rem}
     .review-card{padding:36px 28px}
+    .consent{grid-template-columns:1fr;left:14px;right:14px;bottom:14px;padding:22px}
+    .consent-actions{justify-content:flex-start}
   }
   @media(prefers-reduced-motion:reduce){
     *{scroll-behavior:auto!important}
@@ -741,13 +756,15 @@
       <h2 style="font-family:var(--display);font-weight:800;font-size:clamp(2.1rem,5vw,4rem);line-height:1;margin-bottom:28px">How we handle your information.</h2>
       <p style="color:var(--mute);margin-bottom:18px">When you send an enquiry, AXIOS CONSTRUCTION PTY LTD collects the details you provide, such as your name, phone number, email address, suburb and project information. We use this information to respond to your enquiry, assess the requested work and communicate with you about our services.</p>
       <p style="color:var(--mute);margin-bottom:18px">We may use service providers to host this website, process form submissions and deliver email. We do not sell your personal information. We retain enquiry information only for legitimate business, record-keeping and legal purposes, and take reasonable steps to protect it.</p>
+      <p style="color:var(--mute);margin-bottom:18px">With your consent, we use Google Analytics 4 to understand visits, page navigation and selected actions such as phone, email, Google Review and successful enquiry clicks. Analytics does not receive the contents of your enquiry form. Google Analytics may use cookies and similar identifiers; advertising storage and personalised advertising signals are disabled in this implementation. You can withdraw consent at any time through Analytics settings in the footer. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color:var(--yellow)">Google's privacy policy</a>.</p>
       <p style="color:var(--mute);margin-bottom:18px">To request access to, correction of or deletion of information you have supplied, contact <a href="mailto:info@axiosconstruction.com.au" style="color:var(--yellow)">info@axiosconstruction.com.au</a> or call <a href="tel:+61417958871" style="color:var(--yellow)">0417 958 871</a>.</p>
-      <p class="mono" style="color:var(--slate);font-size:.72rem">Last updated: 2 July 2026. This notice should be reviewed if analytics, advertising cookies or additional third-party services are added.</p>
+      <p class="mono" style="color:var(--slate);font-size:.72rem">Last updated: 2 July 2026. This notice should be reviewed if advertising or additional third-party services are added.</p>
     </div>
   </div></div>
 </section>
 </main>
 
+<input class="analytics-settings-toggle" id="analyticsSettingsToggle" type="checkbox" aria-hidden="true" tabindex="-1">
 <footer>
   <div class="wrap">
     <div class="foot">
@@ -760,16 +777,116 @@
       <div><h4>Get in touch</h4><a href="tel:+61417958871">0417 958 871</a><a href="mailto:info@axiosconstruction.com.au">info@axiosconstruction.com.au</a><a data-link="#contact">Request a quote</a></div>
     </div>
     <div class="fbot">
-      <span>© <span id="yr"></span> AXIOS CONSTRUCTION PTY LTD · ABN 33 671 469 702 · <a data-link="#privacy" style="display:inline">Privacy</a></span>
+      <span>© <span id="yr"></span> AXIOS CONSTRUCTION PTY LTD · ABN 33 671 469 702 · <a data-link="#privacy" style="display:inline">Privacy</a> · <label class="analytics-settings" for="analyticsSettingsToggle">Analytics settings</label></span>
       <span>NSW Contractor Lic. 455003C · Greater Sydney · 0417 958 871</span>
     </div>
   </div>
 </footer>
 
+<aside class="consent" id="analyticsConsent" role="dialog" aria-labelledby="consentTitle" aria-describedby="consentText" hidden>
+  <div>
+    <h2 id="consentTitle">Optional website analytics</h2>
+    <p id="consentText">We use Google Analytics only with your permission to understand visits and improve this site. Enquiry form contents are never sent to Analytics. <a href="#privacy">Privacy notice</a></p>
+  </div>
+  <div class="consent-actions">
+    <button class="btn btn-o" id="analyticsDecline" type="button">No thanks</button>
+    <button class="btn btn-y" id="analyticsAccept" type="button">Allow analytics</button>
+  </div>
+</aside>
+
 <script>
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const EASE = 'cubic-bezier(.76,0,.24,1)';
   document.getElementById('yr').textContent = new Date().getFullYear();
+
+  /* ---------- consent-first Google Analytics ---------- */
+  const GA_ID = 'G-TN6BDGXX5T';
+  const ANALYTICS_CONSENT_KEY = 'axios_analytics_consent';
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ window.dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    analytics_storage: 'denied',
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    security_storage: 'granted'
+  });
+  let analyticsLoaded = false;
+  let analyticsReady = false;
+
+  let analyticsConsentMemory = null;
+  function getAnalyticsConsent(){
+    try{ return localStorage.getItem(ANALYTICS_CONSENT_KEY) || analyticsConsentMemory; }
+    catch(err){ return analyticsConsentMemory; }
+  }
+
+  function setAnalyticsConsent(value){
+    analyticsConsentMemory = value;
+    try{ localStorage.setItem(ANALYTICS_CONSENT_KEY, value); }
+    catch(err){ /* Consent still applies for this page view. */ }
+  }
+
+  function analyticsAllowed(){ return getAnalyticsConsent() === 'granted'; }
+
+  function trackPageView(){
+    if(!analyticsReady || !analyticsAllowed()) return;
+    gtag('event', 'page_view', {
+      page_title: document.title,
+      page_location: location.href,
+      page_path: location.pathname + location.search + location.hash
+    });
+  }
+
+  function trackEvent(name, params={}){
+    if(!analyticsReady || !analyticsAllowed()) return;
+    gtag('event', name, params);
+  }
+
+  function loadAnalytics(){
+    if(analyticsLoaded || !analyticsAllowed()) return;
+    analyticsLoaded = true;
+    gtag('consent', 'update', { analytics_storage: 'granted' });
+    gtag('js', new Date());
+    gtag('config', GA_ID, {
+      send_page_view: false,
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false
+    });
+    const tag = document.createElement('script');
+    tag.async = true;
+    tag.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
+    tag.onload = ()=>{ analyticsReady = true; trackPageView(); };
+    tag.onerror = ()=>{ analyticsLoaded = false; analyticsReady = false; };
+    document.head.appendChild(tag);
+  }
+
+  const consentPanel = document.getElementById('analyticsConsent');
+  const consentAccept = document.getElementById('analyticsAccept');
+  const consentDecline = document.getElementById('analyticsDecline');
+  const consentSettingsToggle = document.getElementById('analyticsSettingsToggle');
+
+  function showAnalyticsChoices(){
+    consentSettingsToggle.checked = true;
+    consentPanel.hidden = false;
+    consentAccept.focus();
+  }
+
+  consentAccept.addEventListener('click', ()=>{
+    setAnalyticsConsent('granted');
+    consentSettingsToggle.checked = false;
+    consentPanel.hidden = true;
+    loadAnalytics();
+  });
+
+  consentDecline.addEventListener('click', ()=>{
+    setAnalyticsConsent('denied');
+    consentSettingsToggle.checked = false;
+    gtag('consent', 'update', { analytics_storage: 'denied' });
+    consentPanel.hidden = true;
+  });
+
+  if(getAnalyticsConsent() === null) consentPanel.hidden = false;
+  else if(analyticsAllowed()) loadAnalytics();
 
   /* ---------- project data ---------- */
   const PROJECTS = {};
@@ -834,6 +951,7 @@
     });
     current = view + (proj ? '/'+proj : '');
     document.title = 'Axios Construction — ' + (view==='home'?'Sydney Building Studio': view.charAt(0).toUpperCase()+view.slice(1));
+    trackPageView();
   }
 
   function sweep(from, to, origin, dur){
@@ -886,6 +1004,17 @@
     links.classList.remove('open'); burger.setAttribute('aria-expanded','false');
   }));
 
+  /* privacy-safe interaction events (no contact details or form text) */
+  document.addEventListener('click', e=>{
+    const link = e.target.closest('a[href]');
+    if(!link) return;
+    const href = link.getAttribute('href') || '';
+    if(href.startsWith('tel:')) trackEvent('click_phone', { link_location: current || 'unknown' });
+    else if(href.startsWith('mailto:')) trackEvent('click_email', { link_location: current || 'unknown' });
+    else if(href.includes('google.com/maps?cid=')) trackEvent('view_google_reviews');
+    else if(href.includes('search.google.com/local/writereview')) trackEvent('leave_google_review');
+  });
+
   /* scroll progress */
   const prog = document.getElementById('progress');
   addEventListener('scroll', ()=>{
@@ -901,6 +1030,7 @@
     if(!f.checkValidity()){ f.reportValidity(); return; }
     const button = f.querySelector('button[type=submit]');
     const status = document.getElementById('formOk');
+    const projectType = f.elements.type.value;
     button.disabled = true;
     button.textContent = 'Sending…';
     status.classList.remove('show');
@@ -915,6 +1045,7 @@
       status.style.background = 'var(--yellow)';
       status.textContent = 'Thanks — your enquiry has been sent. We will be in touch.';
       status.classList.add('show');
+      trackEvent('generate_lead', { form_name: 'quote', project_type: projectType });
       f.reset();
       button.textContent = 'Enquiry sent ✓';
     }catch(err){
@@ -1133,6 +1264,7 @@
     /* hand-off: prefill contact form + route to contact */
     $('cta').addEventListener('click', ()=>{
       const c=compute();
+      trackEvent('estimate_to_contact', { project_type: state.type });
       const typeMap={new:'New home',reno:'Renovation',extension:'Extension / addition',commercial:'Commercial / fit-out'};
       const sel=$('f-type');
       if(sel){ const want=typeMap[state.type]; Array.from(sel.options).forEach(o=>{ if(o.text===want) sel.value=o.value; }); }
