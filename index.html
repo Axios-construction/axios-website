@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axios Construction — Sydney Building Studio</title>
+<meta name="description" content="Axios Construction — a Sydney building studio. New homes, renovations, extensions and commercial projects, delivered end to end by one licensed team.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0E0F11;
+    --panel:#16181B;
+    --steel:#23262B;
+    --steel2:#2E323A;--panel2:#1C1F23;
+    --line:rgba(237,234,227,.12);
+    --line-soft:rgba(237,234,227,.06);
+    --yellow:#FFCB05;
+    --yellow-dim:#d9ad04;
+    --wash:#EDEAE3;
+    --mute:#9aa1a8;
+    --slate:#7C8893;
+    --display:'Bricolage Grotesque',sans-serif;
+    --body:'Hanken Grotesk',sans-serif;
+    --mono:'Space Mono',monospace;
+    --gutter:clamp(20px,5vw,72px);
+    --maxw:1320px;
+    --ease:cubic-bezier(.76,0,.24,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--body);
+    background:var(--ink);
+    color:var(--wash);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--yellow);color:var(--ink)}
+  :focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter);width:100%}
+  .mono{font-family:var(--mono)}
+  .skip{position:absolute;left:-999px;top:0;background:var(--yellow);color:var(--ink);padding:10px 16px;font-family:var(--mono);font-weight:700;z-index:400}
+  .skip:focus{left:8px;top:8px}
+
+  /* kicker / index label */
+  .kick{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--yellow);display:inline-flex;gap:.7em;align-items:center}
+  .kick .ix{color:var(--slate)}
+
+  /* ---------- scroll progress ---------- */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--yellow);z-index:350;transition:width .1s linear}
+
+  /* ---------- loader ---------- */
+  .loader{position:fixed;inset:0;background:var(--ink);z-index:500;display:grid;place-items:center}
+  .loader .lg{font-family:var(--display);font-weight:800;font-size:clamp(2.5rem,9vw,6rem);letter-spacing:-.02em;color:var(--wash);overflow:hidden;display:flex}
+  .loader .lg span{display:inline-block;transform:translateY(110%);opacity:0}
+  .loader .lg .dot{color:var(--yellow)}
+  .loader .bar{position:absolute;bottom:0;left:0;height:4px;width:0;background:var(--yellow)}
+
+  /* ---------- curtain ---------- */
+  .curtain{position:fixed;inset:0;z-index:300;pointer-events:none;background:var(--yellow);transform:scaleY(0);transform-origin:bottom;display:grid;place-items:center}
+  .curtain .cmark{font-family:var(--display);font-weight:800;font-size:clamp(2rem,7vw,4.5rem);color:var(--ink);letter-spacing:-.02em;opacity:0;transform:translateY(14px)}
+
+  /* ---------- header ---------- */
+  header{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(14,15,17,.72);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-soft)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand .mk{width:34px;height:34px;background:var(--yellow);color:var(--ink);font-family:var(--display);font-weight:800;display:grid;place-items:center;font-size:1.15rem}
+  .brand .bt{font-family:var(--display);font-weight:700;font-size:1.02rem;letter-spacing:.01em;line-height:1}
+  .brand .bt small{display:block;font-family:var(--mono);font-size:.56rem;letter-spacing:.32em;color:var(--slate);margin-top:4px}
+  .links{display:flex;gap:6px}
+  .links a{position:relative;font-family:var(--mono);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);padding:9px 14px;transition:color .25s}
+  .links a .n{color:var(--slate);margin-right:.5em;font-size:.66rem}
+  .links a:hover{color:var(--wash)}
+  .links a.current{color:var(--ink);background:var(--yellow)}
+  .links a.current .n{color:var(--ink);opacity:.6}
+  .navcta{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);padding:11px 18px;transition:.25s;color:var(--wash)}
+  .navcta:hover{background:var(--wash);color:var(--ink);border-color:var(--wash)}
+  .burger{display:none;background:none;border:1px solid var(--line);color:var(--wash);font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;padding:10px 12px;cursor:pointer;text-transform:uppercase}
+
+  /* ---------- view system ---------- */
+  main{min-height:100vh}
+  .view{display:none}
+  .view.active{display:block}
+  .st{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0)*70ms)}
+  .view.in .st{opacity:1;transform:none}
+
+  .pad{padding:128px 0 96px}
+  .pad-sm{padding:110px 0 80px}
+
+  /* ---------- buttons ---------- */
+  .btn{display:inline-flex;align-items:center;gap:.6em;font-family:var(--mono);font-weight:700;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;padding:16px 26px;cursor:pointer;border:1px solid transparent;transition:transform .15s var(--ease),background .25s,color .25s,border-color .25s}
+  .btn .arr{transition:transform .25s var(--ease)}
+  .btn:hover .arr{transform:translateX(5px)}
+  .btn-y{background:var(--yellow);color:var(--ink)}
+  .btn-y:hover{background:#ffd633}
+  .btn-o{background:transparent;color:var(--wash);border-color:var(--line)}
+  .btn-o:hover{border-color:var(--yellow);color:var(--yellow)}
+  .btn:active{transform:translateY(1px)}
+
+  /* ---------- HERO ---------- */
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;padding:90px 0 40px}
+  .hero .ghost{position:absolute;font-family:var(--display);font-weight:800;font-size:42vw;color:#fff;opacity:.018;white-space:nowrap;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;letter-spacing:-.04em;animation:drift 26s var(--ease) infinite alternate}
+  @keyframes drift{from{transform:translate(-54%,-50%)}to{transform:translate(-46%,-50%)}}
+  .hero .sweepline{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--yellow),transparent);opacity:.4;animation:sweepY 7s linear infinite}
+  .hero .sweepline.b{animation-delay:3.5s;animation-duration:9s}
+  @keyframes sweepY{0%{top:8%;opacity:0}10%{opacity:.5}90%{opacity:.5}100%{top:92%;opacity:0}}
+  .hero .wrap{position:relative;z-index:2}
+  .hero-meta{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:46px}
+  .hero h1{font-family:var(--display);font-weight:800;font-size:clamp(2.8rem,8.4vw,7.4rem);line-height:.95;letter-spacing:-.025em;max-width:16ch}
+  .hero h1 em{color:var(--yellow);font-style:normal}
+  .hero-line{overflow:hidden}
+  .hero p.lede{max-width:50ch;font-size:clamp(1.02rem,1.6vw,1.2rem);color:var(--mute);margin:32px 0 40px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+
+  /* marquee */
+  .marquee{margin-top:70px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap}
+  .marquee .track{display:inline-flex;gap:0;animation:scrollx 26s linear infinite}
+  .marquee .track span{font-family:var(--display);font-weight:700;font-size:1.5rem;text-transform:uppercase;padding:20px 0;letter-spacing:.01em;color:var(--wash)}
+  .marquee .track .sep{color:var(--yellow);padding:20px 30px}
+  @keyframes scrollx{to{transform:translateX(-50%)}}
+
+  /* ---------- section heads ---------- */
+  .head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;margin-bottom:60px}
+  .head h2{font-family:var(--display);font-weight:800;font-size:clamp(2.1rem,5.4vw,4.4rem);line-height:.98;letter-spacing:-.02em;max-width:15ch}
+  .head h2 em{color:var(--yellow);font-style:normal}
+  .head .lede{max-width:40ch;color:var(--mute);font-size:1.02rem}
+
+  /* ---------- studio ---------- */
+  .stmnt{font-family:var(--display);font-weight:600;font-size:clamp(1.6rem,3.6vw,2.9rem);line-height:1.2;letter-spacing:-.01em;max-width:24ch;margin-bottom:64px}
+  .stmnt em{color:var(--yellow);font-style:normal}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+  .values{display:grid;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft)}
+  .val{background:var(--ink);padding:26px 28px;display:flex;gap:22px;align-items:flex-start}
+  .val .vn{font-family:var(--mono);color:var(--yellow);font-size:.82rem;padding-top:4px}
+  .val h4{font-family:var(--display);font-weight:700;font-size:1.2rem;margin-bottom:7px}
+  .val p{color:var(--mute);font-size:.94rem}
+  .statrow{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);margin-top:70px}
+  .statrow .s{padding:28px 20px 0 0}
+  .statrow .s .n{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4vw,3.2rem);line-height:1}
+  .statrow .s .n em{color:var(--yellow);font-style:normal}
+  .statrow .s .l{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-top:10px;display:block}
+
+  /* ---------- services ---------- */
+  .svc-list{border-top:1px solid var(--line)}
+  .svc{display:grid;grid-template-columns:80px 1fr auto;gap:30px;align-items:center;padding:38px 0;border-bottom:1px solid var(--line);cursor:default;transition:padding .3s var(--ease)}
+  .svc:hover{padding-left:16px}
+  .svc .sn{font-family:var(--mono);color:var(--slate);font-size:.9rem}
+  .svc .sc h3{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,3.4vw,2.6rem);text-transform:uppercase;line-height:1;transition:color .25s}
+  .svc:hover .sc h3{color:var(--yellow)}
+  .svc .sc p{color:var(--mute);margin-top:10px;max-width:60ch;font-size:.98rem}
+  .svc .tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:230px}
+  .svc .tags span{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;color:var(--mute);border:1px solid var(--line);padding:5px 10px}
+
+  /* ---------- projects ---------- */
+  .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .card{display:block;border:1px solid var(--line);background:var(--panel);overflow:hidden;cursor:pointer;transition:transform .3s var(--ease),border-color .3s}
+  .card:hover{transform:translateY(-5px);border-color:var(--yellow)}
+  .card .vis{aspect-ratio:4/3;position:relative;overflow:hidden;background:var(--steel)}
+  .card .vis::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:34px 34px;transition:transform .5s var(--ease)}
+  .card:hover .vis::after{transform:scale(1.08)}
+  .card .vis .pn{position:absolute;right:16px;bottom:2px;font-family:var(--display);font-weight:800;font-size:5rem;color:rgba(255,203,5,.92);line-height:.8}
+  .card .vis .tg{position:absolute;left:16px;top:16px;font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;background:var(--yellow);color:var(--ink);padding:5px 10px;font-weight:700}
+  .card.v2 .vis{background:var(--steel2)}
+  .card.v3 .vis{background:#34383f}
+  .card.v4 .vis{background:#1d2024}
+  .card.v5 .vis{background:#3b3f47}
+  .card.v6 .vis{background:#26292e}
+  .card .ci{padding:22px 24px 26px}
+  .card .ci h3{font-family:var(--display);font-weight:800;font-size:1.3rem;text-transform:uppercase;line-height:1.05;margin-bottom:5px}
+  .card .ci .lc{font-family:var(--mono);font-size:.74rem;color:var(--slate)}
+  .card .ci .go{margin-top:16px;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow);display:flex;align-items:center;gap:8px}
+
+  /* ---------- project detail ---------- */
+  .pd-back{font-family:var(--mono);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);display:inline-flex;gap:9px;align-items:center;margin-bottom:40px;cursor:pointer;border:none;background:none;transition:color .2s}
+  .pd-back:hover{color:var(--yellow)}
+  .pd-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:end;margin-bottom:54px}
+  .pd-hero h2{font-family:var(--display);font-weight:800;font-size:clamp(2.2rem,5.5vw,4.4rem);text-transform:uppercase;line-height:.96;letter-spacing:-.02em}
+  .pd-vis{aspect-ratio:16/10;background:var(--steel);position:relative;overflow:hidden;border:1px solid var(--line)}
+  .pd-vis::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:40px 40px}
+  .pd-vis .bg{position:absolute;right:20px;bottom:-6px;font-family:var(--display);font-weight:800;font-size:9rem;color:rgba(255,203,5,.9);line-height:.8}
+  .pd-spec{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:46px}
+  .pd-spec .c{padding:24px 18px 24px 0;border-right:1px solid var(--line-soft)}
+  .pd-spec .c:last-child{border-right:none}
+  .pd-spec .c span{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);display:block;margin-bottom:8px}
+  .pd-spec .c strong{font-family:var(--display);font-weight:700;font-size:1.15rem}
+  .pd-body{display:grid;grid-template-columns:1.2fr .8fr;gap:54px;align-items:start}
+  .pd-body p{color:var(--mute);font-size:1.05rem;margin-bottom:18px;max-width:58ch}
+  .pd-body h4{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow);margin-bottom:18px}
+  .pd-body ul{list-style:none;display:grid;gap:12px}
+  .pd-body li{display:flex;gap:12px;align-items:baseline;font-size:.96rem;color:var(--wash);border-bottom:1px solid var(--line-soft);padding-bottom:12px}
+  .pd-body li::before{content:"";width:7px;height:7px;background:var(--yellow);flex:none;transform:translateY(-1px)}
+
+  /* ---------- team ---------- */
+  .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .tm{border:1px solid var(--line);background:var(--panel);overflow:hidden;transition:border-color .3s,transform .3s var(--ease)}
+  .tm:hover{border-color:var(--yellow);transform:translateY(-5px)}
+  .tm .av{aspect-ratio:1/1;display:grid;place-items:center;background:var(--steel);position:relative;overflow:hidden}
+  .tm .av::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:30px 30px}
+  .tm .av .mono-initials{font-family:var(--display);font-weight:800;font-size:3.4rem;color:var(--wash);z-index:1;transition:color .3s,transform .4s var(--ease)}
+  .tm:hover .av .mono-initials{color:var(--yellow);transform:scale(1.06)}
+  .tm.t2 .av{background:var(--steel2)}.tm.t3 .av{background:#34383f}.tm.t4 .av{background:#1d2024}.tm.t5 .av{background:#3b3f47}.tm.t6 .av{background:#26292e}
+  .tm .ti{padding:22px 24px 26px}
+  .tm .ti h3{font-family:var(--display);font-weight:700;font-size:1.25rem;line-height:1}
+  .tm .ti .role{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--yellow);margin:9px 0 14px}
+  .tm .ti p{color:var(--mute);font-size:.9rem}
+
+  /* ---------- contact ---------- */
+  .contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:60px;align-items:start}
+  .ci-block .line{display:flex;flex-direction:column;gap:5px;margin-bottom:26px}
+  .ci-block .line span{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--slate)}
+  .ci-block .line strong{font-family:var(--display);font-weight:700;font-size:1.4rem}
+  .ci-block .line strong a:hover{color:var(--yellow)}
+  form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .field{display:flex;flex-direction:column;gap:7px}
+  .field.full{grid-column:1/-1}
+  .field label{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+  .field input,.field select,.field textarea{font-family:var(--body);font-size:1rem;padding:14px 15px;border:1px solid var(--line);background:var(--panel);color:var(--wash);border-radius:0;width:100%}
+  .field textarea{resize:vertical;min-height:120px}
+  .field input::placeholder,.field textarea::placeholder{color:var(--slate)}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--yellow)}
+  .form-note{grid-column:1/-1;font-family:var(--mono);font-size:.72rem;color:var(--slate)}
+  .form-ok{grid-column:1/-1;display:none;background:var(--yellow);color:var(--ink);padding:18px 20px;font-family:var(--mono);font-size:.88rem;font-weight:700}
+  .form-ok.show{display:block}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line);padding:60px 0 34px;margin-top:40px}
+  .foot{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:36px;padding-bottom:44px;border-bottom:1px solid var(--line-soft)}
+  .foot .fb .name{font-family:var(--display);font-weight:800;font-size:1.5rem}
+  .foot .fb .name em{color:var(--yellow);font-style:normal}
+  .foot .fb p{color:var(--slate);font-family:var(--mono);font-size:.76rem;margin-top:10px;max-width:32ch}
+  .foot h4{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow);margin-bottom:16px}
+  .foot a{display:block;color:var(--mute);font-size:.9rem;margin-bottom:10px;transition:color .2s;cursor:pointer}
+  .foot a:hover{color:var(--wash)}
+  .fbot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:26px;font-family:var(--mono);font-size:.72rem;color:var(--slate)}
+
+  /* ---------- mobile ---------- */
+  @media(max-width:1000px){
+    .grid-2,.pd-hero,.pd-body,.contact-grid{grid-template-columns:1fr;gap:40px}
+    .pgrid,.tgrid{grid-template-columns:repeat(2,1fr)}
+    .pd-spec{grid-template-columns:repeat(2,1fr)}
+    .pd-spec .c:nth-child(2){border-right:none}
+    .foot{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:680px){
+    .links{display:none;position:absolute;top:72px;left:0;right:0;flex-direction:column;background:rgba(14,15,17,.98);border-bottom:1px solid var(--line);padding:8px var(--gutter) 20px}
+    .links.open{display:flex}
+    .links a{padding:15px 0;border-bottom:1px solid var(--line-soft)}
+    .links a.current{background:none;color:var(--yellow)}
+    .navcta{display:none}
+    .burger{display:block}
+    .svc{grid-template-columns:1fr;gap:14px;padding:30px 0}
+    .svc .tags{justify-content:flex-start;max-width:none}
+    .svc .sn{display:none}
+    .pgrid,.tgrid,.statrow{grid-template-columns:1fr}
+    .statrow .s{border-bottom:1px solid var(--line-soft);padding-bottom:22px}
+    .marquee .track span{font-size:1.2rem}
+    form{grid-template-columns:1fr}
+    .foot{grid-template-columns:1fr}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{scroll-behavior:auto!important}
+    .st{opacity:1!important;transform:none!important;transition:none!important}
+    .ghost,.sweepline,.marquee .track{animation:none!important}
+    .card,.tm,.btn,.svc,.chip{transition:none}
+  }
+
+  /* ===================== ESTIMATOR TOOL ===================== */
+  .tool{display:grid;grid-template-columns:1fr 400px;gap:30px;align-items:start;margin-top:10px}
+  .panel{background:var(--panel);border:1px solid var(--line);padding:clamp(20px,3vw,34px)}
+  .block{padding:26px 0;border-bottom:1px solid var(--line-soft)}
+  .block:first-child{padding-top:4px}
+  .block:last-child{border-bottom:none;padding-bottom:4px}
+  .block.hide{display:none}
+  .lab{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:16px}
+  .lab .t{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--wash)}
+  .lab .h{font-family:var(--mono);font-size:.72rem;color:var(--slate)}
+  .chips{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{font-family:var(--body);font-weight:600;font-size:.92rem;padding:12px 18px;background:var(--panel2);border:1px solid var(--line);color:var(--wash);cursor:pointer;transition:.18s var(--ease);display:flex;flex-direction:column;gap:3px;min-width:0}
+  .chip small{font-family:var(--mono);font-size:.66rem;font-weight:400;color:var(--slate);letter-spacing:.02em}
+  .chip:hover{border-color:var(--slate)}
+  .chip[aria-pressed="true"]{background:var(--yellow);color:var(--ink);border-color:var(--yellow)}
+  .chip[aria-pressed="true"] small{color:rgba(14,15,17,.7)}
+  .chip.count{min-width:58px;align-items:center}
+  .slider-row{display:flex;align-items:center;gap:18px}
+  .slider-row input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:4px;background:var(--steel);outline:none}
+  .slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;background:var(--yellow);cursor:pointer;border:0}
+  .slider-row input[type=range]::-moz-range-thumb{width:22px;height:22px;background:var(--yellow);cursor:pointer;border:0;border-radius:0}
+  .areaval{font-family:var(--display);font-weight:800;font-size:1.5rem;min-width:120px;text-align:right}
+  .areaval span{font-family:var(--mono);font-size:.78rem;color:var(--slate);font-weight:400}
+  .areahint{font-family:var(--mono);font-size:.7rem;color:var(--slate);margin-top:10px}
+  .est{position:sticky;top:90px;background:linear-gradient(180deg,#1a1c20,#141518);border:1px solid var(--line)}
+  .est-top{padding:26px 28px 24px;border-bottom:1px solid var(--line-soft)}
+  .est-top .el{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--slate)}
+  .est-range{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,3.4vw,2.5rem);letter-spacing:-.02em;line-height:1.04;margin:10px 0 4px;color:var(--yellow)}
+  .est-mid{font-family:var(--mono);font-size:.78rem;color:var(--mute)}
+  .est-scale{margin-top:20px}
+  .est-scale .ebar{height:6px;background:var(--steel);position:relative;overflow:hidden}
+  .est-scale .ebar i{position:absolute;left:0;top:0;bottom:0;background:var(--yellow);width:0;transition:width .5s var(--ease)}
+  .est-scale .sl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-top:8px}
+  .est-scale .tier{color:var(--yellow)}
+  .bd{padding:22px 28px}
+  .bd .erow{display:flex;justify-content:space-between;gap:14px;padding:9px 0;font-size:.9rem;border-bottom:1px solid var(--line-soft)}
+  .bd .erow:last-of-type{border-bottom:none}
+  .bd .erow .k{color:var(--mute)}
+  .bd .erow .k small{display:block;font-family:var(--mono);font-size:.66rem;color:var(--slate)}
+  .bd .erow .v{font-family:var(--mono);font-weight:700;white-space:nowrap}
+  .bd .erow.add .v{color:var(--yellow)}
+  .est-foot{padding:0 28px 26px}
+  .conting{font-family:var(--mono);font-size:.72rem;color:var(--mute);background:var(--panel2);border:1px solid var(--line-soft);padding:12px 14px;margin-bottom:18px}
+  .conting b{color:var(--wash)}
+  .cta{display:block;width:100%;text-align:center;background:var(--yellow);color:var(--ink);font-family:var(--mono);font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;padding:16px;border:0;cursor:pointer;transition:.2s}
+  .cta:hover{background:#ffd633}
+  .ereset{display:block;width:100%;text-align:center;background:none;border:1px solid var(--line);color:var(--mute);font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;padding:13px;margin-top:10px;cursor:pointer;transition:.2s}
+  .ereset:hover{border-color:var(--slate);color:var(--wash)}
+  .disclaim{font-family:var(--mono);font-size:.68rem;line-height:1.7;color:var(--slate);border-top:1px solid var(--line-soft);padding:22px 0 0;margin-top:40px;max-width:90ch}
+  .disclaim b{color:var(--mute)}
+  @media(max-width:1000px){.tool{grid-template-columns:1fr}.est{position:static}}
+  @media(max-width:520px){.chip{flex:1 1 auto}.chip.count{flex:0 0 auto}.areaval{font-size:1.3rem;min-width:96px}}
+</style>
+</head>
+<body>
+<a href="#home" class="skip">Skip to content</a>
+<div class="progress" id="progress"></div>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="lg" id="lg">
+    <span>A</span><span>X</span><span>I</span><span>O</span><span>S</span><span class="dot">.</span>
+  </div>
+  <div class="bar" id="lbar"></div>
+</div>
+
+<!-- CURTAIN -->
+<div class="curtain" id="curtain"><span class="cmark">AXIOS.</span></div>
+
+<!-- HEADER -->
+<header>
+  <div class="wrap">
+    <nav class="nav">
+      <a href="#home" class="brand" data-close aria-label="Axios home">
+        <span class="mk">A</span>
+        <span class="bt">AXIOS<small>CONSTRUCTION · SYD</small></span>
+      </a>
+      <div class="links" id="links">
+        <a href="#home" data-close><span class="n">01</span>Home</a>
+        <a href="#studio" data-close><span class="n">02</span>Studio</a>
+        <a href="#services" data-close><span class="n">03</span>Build</a>
+        <a href="#projects" data-close><span class="n">04</span>Projects</a>
+        <a href="#team" data-close><span class="n">05</span>Team</a>
+        <a href="#estimate" data-close><span class="n">06</span>Estimate</a>
+        <a href="#contact" data-close><span class="n">07</span>Contact</a>
+      </div>
+      <a href="#contact" class="navcta" data-close>Request a quote</a>
+      <button class="burger" id="burger" aria-expanded="false" aria-controls="links">Menu</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============ HOME ============ -->
+<section class="view" id="view-home">
+  <div class="hero">
+    <div class="ghost" aria-hidden="true">AXIOS</div>
+    <div class="sweepline" aria-hidden="true"></div>
+    <div class="sweepline b" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="hero-meta st" style="--i:0">
+        <span class="kick"><span class="ix">[ 00 ]</span> Sydney Building Studio</span>
+        <span class="kick"><span class="ix">Est.</span> [Year] · NSW Lic. [00000C]</span>
+      </div>
+      <h1 class="st" style="--i:1"><span class="hero-line">We build</span> <span class="hero-line"><em>worthy.</em></span> <span class="hero-line">Across Sydney.</span></h1>
+      <p class="lede st" style="--i:2">New homes, renovations, extensions and commercial projects — designed, approved and delivered end to end by one licensed team. The name means worthy. So does the work.</p>
+      <div class="hero-cta st" style="--i:3">
+        <a href="#projects" class="btn btn-y" data-close>View projects <span class="arr">→</span></a>
+        <a href="#contact" class="btn btn-o" data-close>Start a build</a>
+      </div>
+      <div class="marquee st" style="--i:4" aria-hidden="true">
+        <div class="track">
+          <span>New Homes</span><span class="sep">◆</span><span>Renovations</span><span class="sep">◆</span><span>Extensions</span><span class="sep">◆</span><span>Commercial Fit-outs</span><span class="sep">◆</span><span>Duplexes</span><span class="sep">◆</span>
+          <span>New Homes</span><span class="sep">◆</span><span>Renovations</span><span class="sep">◆</span><span>Extensions</span><span class="sep">◆</span><span>Commercial Fit-outs</span><span class="sep">◆</span><span>Duplexes</span><span class="sep">◆</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STUDIO ============ -->
+<section class="view" id="view-studio">
+  <div class="pad"><div class="wrap">
+    <span class="kick st" style="--i:0"><span class="ix">[ 02 ]</span> The Studio</span>
+    <p class="stmnt st" style="--i:1">Axios is a Sydney building studio, not a sign on a ute. One company carries every job from the first site walk to the final certificate — so <em>nothing falls through the cracks between trades.</em></p>
+
+    <div class="grid-2">
+      <div class="st" style="--i:2">
+        <p style="color:var(--mute);font-size:1.05rem;margin-bottom:18px;max-width:52ch">We started on the tools and never really left. That's why our quotes are itemised, our scopes are fixed, and you always know which Axios person is accountable for your build.</p>
+        <p style="color:var(--mute);font-size:1.05rem;max-width:52ch">Residential or commercial, a single bathroom or a ground-up duplex — the standard is the same. Worthy of carrying load for decades.</p>
+      </div>
+      <div class="values st" style="--i:3">
+        <div class="val"><span class="vn">/01</span><div><h4>One team, end to end</h4><p>Design coordination, approvals, trades and certification under one roof.</p></div></div>
+        <div class="val"><span class="vn">/02</span><div><h4>Fixed scope, fixed price</h4><p>Itemised quotes with no mid-build surprises or creeping variations.</p></div></div>
+        <div class="val"><span class="vn">/03</span><div><h4>Built to certify</h4><p>Licensed trades and certified materials on every job, inspected in stages.</p></div></div>
+      </div>
+    </div>
+
+    <div class="statrow st" style="--i:4">
+      <div class="s"><div class="n"><em>16</em></div><span class="l">Years on Sydney sites</span></div>
+      <div class="s"><div class="n">240<em>+</em></div><span class="l">Projects delivered</span></div>
+      <div class="s"><div class="n">100<em>%</em></div><span class="l">Licensed &amp; insured</span></div>
+      <div class="s"><div class="n">5<em>★</em></div><span class="l">Avg. client rating</span></div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section class="view" id="view-services">
+  <div class="pad"><div class="wrap">
+    <div class="head st" style="--i:0">
+      <div>
+        <span class="kick"><span class="ix">[ 03 ]</span> What we build</span>
+        <h2 style="margin-top:18px">One team.<br><em>Every</em> build type.</h2>
+      </div>
+      <p class="lede">From a single-room extension to a ground-up commercial shell — Axios runs the whole job in-house.</p>
+    </div>
+
+    <div class="svc-list">
+      <div class="svc st" style="--i:1">
+        <div class="sn">/01</div>
+        <div class="sc"><h3>New Homes</h3><p>Custom single and double-storey homes built to your brief, your block and your budget — start to keys.</p></div>
+        <div class="tags"><span>Architectural</span><span>Project homes</span><span>Knockdown rebuild</span><span>Duplexes</span></div>
+      </div>
+      <div class="svc st" style="--i:2">
+        <div class="sn">/02</div>
+        <div class="sc"><h3>Renovations</h3><p>Reworking what you've got — full interior overhauls, kitchens and bathrooms that add real, valuer-backed value.</p></div>
+        <div class="tags"><span>Interior</span><span>Kitchen</span><span>Bathroom</span><span>Heritage</span></div>
+      </div>
+      <div class="svc st" style="--i:3">
+        <div class="sn">/03</div>
+        <div class="sc"><h3>Extensions</h3><p>Second storeys and rear additions engineered to sit seamlessly on the existing structure.</p></div>
+        <div class="tags"><span>First-floor add</span><span>Rear extension</span><span>Structural</span></div>
+      </div>
+      <div class="svc st" style="--i:4">
+        <div class="sn">/04</div>
+        <div class="sc"><h3>Commercial</h3><p>Warehouses, retail and office fit-outs delivered to program, with minimal disruption to your operation.</p></div>
+        <div class="tags"><span>Fit-out</span><span>Industrial</span><span>Make-good</span><span>Refurbishment</span></div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============ PROJECTS ============ -->
+<section class="view" id="view-projects">
+  <div class="pad"><div class="wrap">
+    <div class="head st" style="--i:0">
+      <div>
+        <span class="kick"><span class="ix">[ 04 ]</span> Selected work</span>
+        <h2 style="margin-top:18px">Built across<br>the <em>basin.</em></h2>
+      </div>
+      <p class="lede">Residential, commercial and everything between — from the inner west to the northern beaches. Tap a project to open the case study.</p>
+    </div>
+    <div class="pgrid" id="pgrid"><!-- cards injected --></div>
+  </div></div>
+</section>
+
+<!-- ============ PROJECT DETAIL ============ -->
+<section class="view" id="view-project">
+  <div class="pad"><div class="wrap">
+    <button class="pd-back st" style="--i:0" data-link="#projects">← Back to projects</button>
+    <div class="pd-hero st" style="--i:1">
+      <div>
+        <span class="kick" id="pd-tag"><span class="ix">[ 04 ]</span> Case study</span>
+        <h2 id="pd-title" style="margin-top:16px">—</h2>
+        <p class="mono" id="pd-loc" style="color:var(--slate);margin-top:14px;font-size:.9rem">—</p>
+      </div>
+      <div class="pd-vis" id="pd-vis"><span class="bg" id="pd-pn">01</span></div>
+    </div>
+    <div class="pd-spec st" style="--i:2">
+      <div class="c"><span>Type</span><strong id="pd-type">—</strong></div>
+      <div class="c"><span>Scope</span><strong id="pd-scope">—</strong></div>
+      <div class="c"><span>Year</span><strong id="pd-year">—</strong></div>
+      <div class="c"><span>Duration</span><strong id="pd-dur">—</strong></div>
+      <div class="c"><span>Value</span><strong id="pd-val">—</strong></div>
+    </div>
+    <div class="pd-body st" style="--i:3">
+      <div id="pd-summary"></div>
+      <div>
+        <h4>Scope of works</h4>
+        <ul id="pd-items"></ul>
+      </div>
+    </div>
+    <div class="st" style="--i:4" style="margin-top:50px">
+      <a href="#contact" class="btn btn-y" data-close>Start a project like this <span class="arr">→</span></a>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============ TEAM ============ -->
+<section class="view" id="view-team">
+  <div class="pad"><div class="wrap">
+    <div class="head st" style="--i:0">
+      <div>
+        <span class="kick"><span class="ix">[ 05 ]</span> Meet the team</span>
+        <h2 style="margin-top:18px">The people<br>on the <em>tools.</em></h2>
+      </div>
+      <p class="lede">Small, senior and accountable. The person who quotes your job is the person who answers the phone.</p>
+    </div>
+    <div class="tgrid">
+      <div class="tm st" style="--i:1"><div class="av"><span class="mono-initials">DV</span></div><div class="ti"><h3>Daniel Voss</h3><div class="role">Founder &amp; Director</div><p>Licensed builder, 20 years on Sydney sites. Owns every quote that leaves the office.</p></div></div>
+      <div class="tm t2 st" style="--i:2"><div class="av"><span class="mono-initials">MI</span></div><div class="ti"><h3>Marko Ilić</h3><div class="role">Construction Manager</div><p>Runs program, trades and budget across every active build at once.</p></div></div>
+      <div class="tm t3 st" style="--i:3"><div class="av"><span class="mono-initials">HP</span></div><div class="ti"><h3>Hannah Pereira</h3><div class="role">Design &amp; Approvals Lead</div><p>Turns a brief into stamped plans and a clean council pathway.</p></div></div>
+      <div class="tm t4 st" style="--i:4"><div class="av"><span class="mono-initials">TW</span></div><div class="ti"><h3>Tom Whitfield</h3><div class="role">Senior Site Supervisor</div><p>On the ground daily. The reason sites finish clean and on time.</p></div></div>
+      <div class="tm t5 st" style="--i:5"><div class="av"><span class="mono-initials">PN</span></div><div class="ti"><h3>Priya Nand</h3><div class="role">Client Liaison</div><p>Your weekly update and single point of contact, footings to handover.</p></div></div>
+      <div class="tm t6 st" style="--i:6"><div class="av"><span class="mono-initials">JA</span></div><div class="ti"><h3>Jack Adeyemi</h3><div class="role">Estimator / QS</div><p>Itemises every scope so the quote you sign is the price you pay.</p></div></div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============ ESTIMATE ============ -->
+<section class="view" id="view-estimate">
+  <div class="pad"><div class="wrap">
+    <div class="head st" style="--i:0">
+      <div>
+        <span class="kick"><span class="ix">[ 06 ]</span> Ballpark estimator</span>
+        <h2 style="margin-top:18px">Scope it.<br><em>Ballpark it.</em></h2>
+      </div>
+      <p class="lede">Pick the shape of your project for an instant indicative range, built on current Sydney rates. A starting point for the conversation — not a fixed quote.</p>
+    </div>
+
+    <div class="tool st" style="--i:1">
+      <!-- controls -->
+      <div class="panel">
+        <div class="block">
+          <div class="lab"><span class="t">Project type</span></div>
+          <div class="chips" data-group="type">
+            <button class="chip" data-value="new" aria-pressed="true">New build<small>Ground-up home</small></button>
+            <button class="chip" data-value="reno" aria-pressed="false">Renovation<small>Rework existing</small></button>
+            <button class="chip" data-value="extension" aria-pressed="false">Extension<small>Add space</small></button>
+            <button class="chip" data-value="commercial" aria-pressed="false">Commercial<small>Fit-out</small></button>
+          </div>
+        </div>
+        <div class="block" id="b-bed">
+          <div class="lab"><span class="t">Bedrooms</span><span class="h" id="bedhint">sets the size estimate</span></div>
+          <div class="chips" data-group="bed">
+            <button class="chip count" data-value="1" aria-pressed="false">1</button>
+            <button class="chip count" data-value="2" aria-pressed="false">2</button>
+            <button class="chip count" data-value="3" aria-pressed="false">3</button>
+            <button class="chip count" data-value="4" aria-pressed="true">4</button>
+            <button class="chip count" data-value="5" aria-pressed="false">5+</button>
+          </div>
+        </div>
+        <div class="block" id="b-bath">
+          <div class="lab"><span class="t">Bathrooms</span><span class="h">wet areas add cost</span></div>
+          <div class="chips" data-group="bath">
+            <button class="chip count" data-value="1" aria-pressed="false">1</button>
+            <button class="chip count" data-value="2" aria-pressed="true">2</button>
+            <button class="chip count" data-value="3" aria-pressed="false">3</button>
+            <button class="chip count" data-value="4" aria-pressed="false">4+</button>
+          </div>
+        </div>
+        <div class="block" id="b-level">
+          <div class="lab"><span class="t" id="levlab">Storeys</span></div>
+          <div class="chips" data-group="level" id="levchips"></div>
+        </div>
+        <div class="block" id="b-area">
+          <div class="lab"><span class="t">Floor area</span><span class="h" id="areamode">estimated — drag to adjust</span></div>
+          <div class="slider-row">
+            <input type="range" id="area" min="40" max="500" step="5" value="240" aria-label="Floor area in square metres">
+            <div class="areaval"><span id="areanum">240</span> <span>m²</span></div>
+          </div>
+          <div class="areahint" id="areahint">≈ a 4-bedroom home</div>
+        </div>
+        <div class="block">
+          <div class="lab"><span class="t">Finish level</span></div>
+          <div class="chips" data-group="finish">
+            <button class="chip" data-value="standard" aria-pressed="false">Standard<small>Project-home spec</small></button>
+            <button class="chip" data-value="mid" aria-pressed="true">Mid-range<small>Quality custom</small></button>
+            <button class="chip" data-value="premium" aria-pressed="false">Premium<small>Architectural</small></button>
+          </div>
+        </div>
+        <div class="block" id="b-complex">
+          <div class="lab"><span class="t">Site conditions</span></div>
+          <div class="chips" data-group="complexity">
+            <button class="chip" data-value="easy" aria-pressed="true">Easy<small>Flat, good access</small></button>
+            <button class="chip" data-value="moderate" aria-pressed="false">Moderate<small>Slope / tight access</small></button>
+            <button class="chip" data-value="difficult" aria-pressed="false">Difficult<small>Steep / constrained</small></button>
+          </div>
+        </div>
+        <div class="block" id="b-addons">
+          <div class="lab"><span class="t">Add-ons</span><span class="h">optional</span></div>
+          <div class="chips" id="addonchips"></div>
+        </div>
+      </div>
+
+      <!-- estimate card -->
+      <div class="est" aria-live="polite">
+        <div class="est-top">
+          <div class="el">Ballpark range</div>
+          <div class="est-range"><span id="lo">$0</span> – <span id="hi">$0</span></div>
+          <div class="est-mid">Midpoint ≈ <span id="mid">$0</span> · incl. GST</div>
+          <div class="est-scale">
+            <div class="ebar"><i id="scalebar"></i></div>
+            <div class="sl"><span>Scale</span><span class="tier" id="tier">—</span></div>
+          </div>
+        </div>
+        <div class="bd" id="breakdown"></div>
+        <div class="est-foot">
+          <div class="conting">Add a contingency of <b id="cont">$0 – $0</b> for surprises — standard on any build.</div>
+          <button class="cta" id="cta" type="button">Request a detailed quote →</button>
+          <button class="ereset" id="reset" type="button">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="disclaim st" style="--i:2">
+      <b>Indicative only — not a quote or an offer.</b> Figures are GST-inclusive ballpark estimates built on published Sydney 2025–26 construction rates and update live as you change inputs. They cover construction only and <b>exclude</b> land purchase, council/DA fees and contributions, HBCF insurance, finance, and loose furnishings. Every site is different — the only way to get a real number is a proper scope and a fixed-price quote.
+    </p>
+  </div></div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="view" id="view-contact">
+  <div class="pad"><div class="wrap">
+    <div class="head st" style="--i:0">
+      <div>
+        <span class="kick"><span class="ix">[ 06 ]</span> Start a build</span>
+        <h2 style="margin-top:18px">Got a project?<br>Let's <em>scope it.</em></h2>
+      </div>
+    </div>
+    <div class="contact-grid">
+      <div class="ci-block st" style="--i:1">
+        <p style="color:var(--mute);margin-bottom:34px;max-width:36ch">Tell us what you're planning and we'll walk the site and put together a fixed-price quote — no obligation.</p>
+        <div class="line"><span>Phone</span><strong><a href="tel:0200000000">[02 0000 0000]</a></strong></div>
+        <div class="line"><span>Email</span><strong><a href="mailto:build@axios.com.au">build@axios.com.au</a></strong></div>
+        <div class="line"><span>Servicing</span><strong>Greater Sydney</strong></div>
+      </div>
+      <form id="quoteForm" class="st" style="--i:2" novalidate>
+        <div class="field"><label for="f-name">Name</label><input id="f-name" name="name" type="text" autocomplete="name" required></div>
+        <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required></div>
+        <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="f-suburb">Suburb</label><input id="f-suburb" name="suburb" type="text" placeholder="e.g. Marrickville"></div>
+        <div class="field full"><label for="f-type">Project type</label>
+          <select id="f-type" name="type">
+            <option>New home</option><option>Renovation</option><option>Extension / addition</option><option>Commercial / fit-out</option><option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="field full"><label for="f-msg">Tell us about the project</label><textarea id="f-msg" name="message" placeholder="Site, timing, rough budget…"></textarea></div>
+        <button type="submit" class="btn btn-y full" style="justify-content:center">Send enquiry <span class="arr">→</span></button>
+        <p class="form-note">Demo form — wire it to your inbox or a form service (Formspree, Netlify Forms) to go live.</p>
+        <div class="form-ok" id="formOk">Thanks — your enquiry is ready to send. Connect this form to email to make it live.</div>
+      </form>
+    </div>
+  </div></div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="fb">
+        <div class="name">AXIOS<em>.</em></div>
+        <p>Sydney's full-service building studio. New homes, renovations, extensions &amp; commercial — built worthy.</p>
+      </div>
+      <div><h4>Build</h4><a data-link="#services">New homes</a><a data-link="#services">Renovations</a><a data-link="#services">Extensions</a><a data-link="#services">Commercial</a></div>
+      <div><h4>Studio</h4><a data-link="#studio">About</a><a data-link="#projects">Projects</a><a data-link="#team">Team</a><a data-link="#contact">Contact</a></div>
+      <div><h4>Get in touch</h4><a href="tel:0200000000">[02 0000 0000]</a><a href="mailto:build@axios.com.au">build@axios.com.au</a><a data-link="#contact">Request a quote</a></div>
+    </div>
+    <div class="fbot">
+      <span>© <span id="yr"></span> Axios Construction Pty Ltd · ABN [00 000 000 000]</span>
+      <span>NSW Builder Lic. [00000C] · Greater Sydney</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const EASE = 'cubic-bezier(.76,0,.24,1)';
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  /* ---------- project data ---------- */
+  const PROJECTS = {
+    marrickville:{tag:'New Home',v:'',pn:'01',title:'The Marrickville House',loc:'Marrickville · Inner West',type:'Double storey',scope:'Full build',year:'2024',dur:'11 months',val:'$1.4M',
+      summary:['A ground-up double-storey family home on a tight inner-west block. We managed demolition, a difficult excavation against the boundary, and a full build with a brick-and-cladding façade tuned to the streetscape.','The result: four bedrooms, an open rear living zone and a garage where a run-down weatherboard cottage used to sit.'],
+      items:['Demolition &amp; boundary excavation','Concrete slab &amp; timber framing','Brick + lightweight cladding façade','Full interior fit-out &amp; joinery','Landscaping, driveway &amp; fencing']},
+    mosman:{tag:'Extension',v:'v2',pn:'02',title:'Mosman Second Storey',loc:'Mosman · Lower North Shore',type:'First-floor addition',scope:'Reno + addition',year:'2023',dur:'7 months',val:'$0.9M',
+      summary:['A first-floor addition over an occupied single-storey home, engineered to land cleanly on the existing structure. The family stayed put for most of the build while we staged the works.','Two new bedrooms, a parents\u2019 retreat and a harbour-glimpse balcony — with the downstairs reworked to match.'],
+      items:['Structural assessment &amp; steel','New first-floor addition','Roof line reconfiguration','Downstairs reconfiguration','Balcony &amp; balustrade']},
+    alexandria:{tag:'Commercial',v:'v3',pn:'03',title:'Alexandria Warehouse',loc:'Alexandria · South Sydney',type:'Industrial fit-out',scope:'Commercial fit-out',year:'2024',dur:'4 months',val:'$0.7M',
+      summary:['A tired warehouse turned into a working HQ with a mezzanine office, amenities and a roller-door loading zone — delivered to a tight tenancy program.','Built around the tenant\u2019s fit-out dates so they could move in on schedule.'],
+      items:['Mezzanine office structure','Amenities &amp; end-of-trip','Electrical &amp; data rough-in','Epoxy flooring &amp; line marking','Roller doors &amp; loading dock']},
+    parramatta:{tag:'Duplex',v:'v4',pn:'04',title:'Parramatta Duplex',loc:'Parramatta · Greater West',type:'Dual occupancy',scope:'KDR + build',year:'2022',dur:'13 months',val:'$1.8M',
+      summary:['A knockdown-rebuild duplex on a single title — two matched three-bedroom dwellings designed for resale and rental yield in the growth corridor.','Handled the subdivision pathway, the build and the certification across both dwellings.'],
+      items:['Knockdown &amp; site prep','Two matched dwellings','Subdivision coordination','Separate services &amp; metering','Twin landscaping packages']},
+    cronulla:{tag:'New Home',v:'v5',pn:'05',title:'Cronulla Beach House',loc:'Cronulla · Sutherland Shire',type:'Coastal new build',scope:'Full build',year:'2023',dur:'12 months',val:'$1.6M',
+      summary:['A coastal new build specified for salt exposure — marine-grade fixings, durable cladding and big glazing pulled toward the afternoon light.','Designed to feel open but stand up to the conditions a beachfront block throws at it.'],
+      items:['Marine-grade structure &amp; fixings','Durable coastal cladding','Large-format glazing','Outdoor living &amp; deck','Low-maintenance landscaping']},
+    surryhills:{tag:'Commercial',v:'v6',pn:'06',title:'Surry Hills Retail Fit-out',loc:'Surry Hills · Inner City',type:'Retail fit-out',scope:'Fit-out + make-good',year:'2024',dur:'3 months',val:'$0.4M',
+      summary:['A heritage shopfront fit-out delivered fast and after-hours to keep the strip trading. Custom joinery, feature lighting and a make-good clause handled at handover.','In and out on program, with the landlord\u2019s conditions met.'],
+      items:['Heritage shopfront works','Custom retail joinery','Feature lighting &amp; ceiling','Flooring &amp; wall finishes','Make-good documentation']}
+  };
+  const ORDER = ['marrickville','mosman','alexandria','parramatta','cronulla','surryhills'];
+
+  /* build project cards */
+  const pgrid = document.getElementById('pgrid');
+  pgrid.innerHTML = ORDER.map((id,idx)=>{
+    const p = PROJECTS[id];
+    return `<a class="card ${p.v} st" style="--i:${idx+1}" data-link="#project/${id}">
+      <div class="vis"><span class="tg">${p.tag}</span><span class="pn">${p.pn}</span></div>
+      <div class="ci"><h3>${p.title}</h3><div class="lc">${p.loc}</div><div class="go">Open case study →</div></div>
+    </a>`;
+  }).join('');
+
+  function populateProject(id){
+    const p = PROJECTS[id]; if(!p) return;
+    document.getElementById('pd-tag').innerHTML = `<span class="ix">[ 04 ]</span> ${p.tag}`;
+    document.getElementById('pd-title').textContent = p.title;
+    document.getElementById('pd-loc').textContent = p.loc;
+    document.getElementById('pd-type').textContent = p.type;
+    document.getElementById('pd-scope').textContent = p.scope;
+    document.getElementById('pd-year').textContent = p.year;
+    document.getElementById('pd-dur').textContent = p.dur;
+    document.getElementById('pd-val').textContent = p.val;
+    document.getElementById('pd-pn').textContent = p.pn;
+    document.getElementById('pd-summary').innerHTML = p.summary.map(s=>`<p>${s}</p>`).join('');
+    document.getElementById('pd-items').innerHTML = p.items.map(s=>`<li>${s}</li>`).join('');
+    const vis = document.getElementById('pd-vis');
+    vis.className = 'pd-vis ' + p.v;
+  }
+
+  /* ---------- view router ---------- */
+  const VIEWS = ['home','studio','services','projects','project','team','estimate','contact'];
+  const curtain = document.getElementById('curtain');
+  const cmark = curtain.querySelector('.cmark');
+  let current = null, busy = false;
+
+  function parse(){
+    const raw = (location.hash || '#home').slice(1);
+    const [v, proj] = raw.split('/');
+    return { view: VIEWS.includes(v) ? v : 'home', proj, key: raw };
+  }
+
+  function setActive(view, proj){
+    if(view === 'project' && proj) populateProject(proj);
+    document.querySelectorAll('.view').forEach(s=>s.classList.remove('active','in'));
+    const el = document.getElementById('view-' + view) || document.getElementById('view-home');
+    el.classList.add('active');
+    window.scrollTo(0,0);
+    requestAnimationFrame(()=> requestAnimationFrame(()=> el.classList.add('in')));
+    // nav highlight (project -> projects)
+    const navKey = view === 'project' ? 'projects' : view;
+    document.querySelectorAll('#links a').forEach(a=>{
+      a.classList.toggle('current', a.getAttribute('href') === '#' + navKey);
+    });
+    current = view + (proj ? '/'+proj : '');
+    document.title = 'Axios Construction — ' + (view==='home'?'Sydney Building Studio': view.charAt(0).toUpperCase()+view.slice(1));
+  }
+
+  function sweep(from, to, origin, dur){
+    return new Promise(res=>{
+      curtain.style.transformOrigin = origin;
+      const a = curtain.animate(
+        [{transform:`scaleY(${from})`},{transform:`scaleY(${to})`}],
+        {duration:dur, easing:EASE}
+      );
+      a.onfinish = ()=>{ curtain.style.transform = `scaleY(${to})`; res(); };
+    });
+  }
+
+  async function route(){
+    if(busy) return;
+    busy = true;
+    let key;
+    do{
+      key = location.hash || '#home';
+      const { view, proj } = parse();
+      if(reduce){
+        setActive(view, proj);
+      }else{
+        cmark.animate([{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],{duration:300,easing:EASE,fill:'forwards'});
+        await sweep(0,1,'top',430);
+        setActive(view, proj);
+        cmark.animate([{opacity:1},{opacity:0}],{duration:200,fill:'forwards'});
+        await sweep(1,0,'bottom',520);
+      }
+    } while((location.hash || '#home') !== key);
+    busy = false;
+  }
+
+  window.addEventListener('hashchange', route);
+
+  /* delegate data-link clicks (footer / detail back) */
+  document.addEventListener('click', e=>{
+    const t = e.target.closest('[data-link]');
+    if(t){ e.preventDefault(); location.hash = t.getAttribute('data-link'); }
+  });
+
+  /* mobile menu */
+  const burger = document.getElementById('burger');
+  const links = document.getElementById('links');
+  burger.addEventListener('click', ()=>{
+    const open = links.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open);
+  });
+  document.querySelectorAll('[data-close]').forEach(a=>a.addEventListener('click', ()=>{
+    links.classList.remove('open'); burger.setAttribute('aria-expanded','false');
+  }));
+
+  /* scroll progress */
+  const prog = document.getElementById('progress');
+  addEventListener('scroll', ()=>{
+    const h = document.documentElement;
+    const sc = h.scrollHeight - h.clientHeight;
+    prog.style.width = (sc>0 ? (h.scrollTop/sc*100) : 0) + '%';
+  }, {passive:true});
+
+  /* contact form */
+  document.getElementById('quoteForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const f = e.target;
+    if(!f.checkValidity()){ f.reportValidity(); return; }
+    document.getElementById('formOk').classList.add('show');
+    f.querySelector('button[type=submit]').textContent = 'Enquiry ready ✓';
+  });
+
+  /* ---------- intro loader ---------- */
+  function boot(){
+    if(!location.hash) history.replaceState(null,'','#home');
+    setActive(parse().view, parse().proj);
+    const loader = document.getElementById('loader');
+    if(reduce){ loader.style.display='none'; return; }
+    const letters = document.querySelectorAll('#lg span');
+    letters.forEach((s,i)=>{
+      s.animate([{transform:'translateY(110%)',opacity:0},{transform:'none',opacity:1}],
+        {duration:560,delay:i*70,easing:EASE,fill:'forwards'});
+    });
+    document.getElementById('lbar').animate([{width:'0%'},{width:'100%'}],{duration:1000,delay:200,easing:'ease',fill:'forwards'});
+    setTimeout(()=>{
+      loader.animate([{transform:'none'},{transform:'translateY(-100%)'}],{duration:680,easing:EASE,fill:'forwards'})
+        .onfinish = ()=> loader.style.display='none';
+    }, 1300);
+  }
+  if(document.readyState === 'complete' || document.readyState === 'interactive') boot();
+  else addEventListener('DOMContentLoaded', boot);
+
+  /* ===================== ESTIMATOR (isolated scope) ===================== */
+  (function(){
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const EASE = 'cubic-bezier(.76,0,.24,1)';
+    const BED_AREA = {1:70,2:120,3:175,4:240,5:320};
+    const RATES = {
+      new:{standard:2000,mid:2900,premium:4800},
+      reno:{standard:2500,mid:4000,premium:6000},
+      ext_ground:{standard:3000,mid:3800,premium:5000},
+      ext_second:{standard:4000,mid:4800,premium:6000},
+      commercial:{standard:1300,mid:2000,premium:2800}
+    };
+    const COMPLEX = {easy:1, moderate:1.1, difficult:1.25};
+    const COMPLEX_LABEL = {easy:'Easy', moderate:'Moderate', difficult:'Difficult'};
+    const WET_PER_BATH = 18000;
+    const ADDONS = [
+      {id:'demo',  label:'Demolition / knockdown', cost:30000, types:['new']},
+      {id:'garage',label:'Double garage',          cost:48000, types:['new']},
+      {id:'pool',  label:'Swimming pool',          cost:65000, types:['new','reno']},
+      {id:'granny',label:'Granny flat / studio',   cost:150000,types:['new']},
+      {id:'land',  label:'Landscaping & driveway', cost:30000, types:['new','reno']},
+      {id:'aircon',label:'Ducted air-con',         cost:20000, types:['new','reno','extension']},
+      {id:'kitchen',label:'Premium kitchen',       cost:35000, types:['reno','extension']},
+      {id:'fitout',label:'Make-good / after-hours',cost:25000, types:['commercial']}
+    ];
+    const LEVELS = {
+      new:[['single','Single storey'],['double','Double storey']],
+      extension:[['ground','Ground floor'],['second','Second storey']]
+    };
+    const state = {type:'new',bed:4,bath:2,level:'single',finish:'mid',complexity:'easy',area:240,areaLocked:false,addons:new Set()};
+    let prevLo=0, prevHi=0, prevMid=0;
+
+    const fmt = n => '$' + Math.round(n).toLocaleString('en-AU');
+    const r1k = n => Math.round(n/1000)*1000;
+    const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+    const $ = id => document.getElementById(id);
+
+    function ratePerM2(){
+      const f = state.finish;
+      if(state.type==='new'){ let r=RATES.new[f]; if(state.level==='double') r*=1.12; return r; }
+      if(state.type==='reno') return RATES.reno[f];
+      if(state.type==='extension') return (state.level==='second'?RATES.ext_second:RATES.ext_ground)[f];
+      return RATES.commercial[f];
+    }
+    function compute(){
+      const rate = ratePerM2();
+      const base = state.area * rate;
+      const extraBaths = state.type==='commercial' ? 0 : Math.max(0, state.bath-2);
+      const wet = extraBaths * WET_PER_BATH;
+      const cMult = state.type==='commercial' ? 1 : COMPLEX[state.complexity];
+      const complexAdd = (base+wet)*(cMult-1);
+      const construction = (base+wet)*cMult;
+      let addonsTotal=0; const addonLines=[];
+      ADDONS.forEach(a=>{ if(state.addons.has(a.id)){ addonsTotal+=a.cost; addonLines.push(a); } });
+      const point = construction + addonsTotal;
+      return {rate,base,extraBaths,wet,cMult,complexAdd,addonsTotal,addonLines,point,
+              lo:point*0.9, hi:point*1.18, contLo:point*0.10, contHi:point*0.15};
+    }
+    function buildSummary(c){
+      const typeLabel={new:'New build',reno:'Renovation',extension:'Extension',commercial:'Commercial fit-out'}[state.type];
+      const addonNames=c.addonLines.map(a=>a.label).join(', ')||'none';
+      let s=`Project scoped with your estimator:\n\nType: ${typeLabel}\n`;
+      if(state.type!=='commercial') s+=`Bedrooms: ${state.bed===5?'5+':state.bed}\nBathrooms: ${state.bath===4?'4+':state.bath}\n`;
+      s+=`Floor area: ${state.area} m²\nFinish: ${state.finish}\n`;
+      if(state.type!=='commercial') s+=`Site conditions: ${COMPLEX_LABEL[state.complexity]}\n`;
+      s+=`Add-ons: ${addonNames}\n\nBallpark range shown: ${fmt(r1k(c.lo))} – ${fmt(r1k(c.hi))}\n\nPlease confirm the above and arrange a proper scope and quote.`;
+      return s;
+    }
+
+    function setPressed(group,val){
+      document.querySelectorAll(`#view-estimate [data-group="${group}"] .chip`).forEach(c=>{
+        c.setAttribute('aria-pressed', String(c.dataset.value===String(val)));
+      });
+    }
+    function renderLevels(){
+      const block=$('b-level'), set=LEVELS[state.type];
+      if(!set){ block.classList.add('hide'); return; }
+      block.classList.remove('hide');
+      $('levlab').textContent = state.type==='extension' ? 'Extension type' : 'Storeys';
+      $('levchips').innerHTML = set.map(([v,l])=>`<button class="chip" data-value="${v}" aria-pressed="${v===state.level}">${l}</button>`).join('');
+    }
+    function renderAddons(){
+      const list = ADDONS.filter(a=>a.types.includes(state.type));
+      if(!list.length){ $('b-addons').classList.add('hide'); return; }
+      $('b-addons').classList.remove('hide');
+      $('addonchips').innerHTML = list.map(a=>`<button class="chip addon" data-addon="${a.id}" aria-pressed="${state.addons.has(a.id)}">${a.label}<small>+${fmt(a.cost)}</small></button>`).join('');
+    }
+    function renderVisibility(){
+      const show=(id,cond)=>$(id).classList.toggle('hide', !cond);
+      const isResi = state.type!=='commercial';
+      show('b-bed', state.type==='new'||state.type==='reno'||state.type==='extension');
+      show('b-bath', isResi);
+      show('b-complex', isResi);
+      $('bedhint').textContent = (state.type==='new'||state.type==='reno') ? 'sets the size estimate' : 'for context';
+    }
+    function renderArea(){
+      const slider=$('area');
+      let min=40,max=500;
+      if(state.type==='extension'){min=10;max=150;}
+      else if(state.type==='commercial'){min=30;max=1000;}
+      slider.min=min; slider.max=max;
+      slider.value = clamp(state.area,min,max);
+      state.area = +slider.value;
+      $('areanum').textContent = state.area;
+      const derived = (state.type==='new'||state.type==='reno') && !state.areaLocked;
+      $('areamode').textContent = derived ? 'estimated — drag to adjust' : 'drag to set';
+      let hint='';
+      if(state.type==='new') hint=`≈ a ${state.bed===5?'5+':state.bed}-bedroom home`;
+      else if(state.type==='reno') hint=`≈ area being renovated`;
+      else if(state.type==='extension') hint=`≈ size of the new space`;
+      else hint=`≈ tenancy / floor area`;
+      $('areahint').textContent = hint;
+    }
+    function animate(el, from, to){
+      if(reduce){ el.textContent = fmt(r1k(to)); return; }
+      const t0=performance.now(), dur=480;
+      (function tick(now){
+        const p=Math.min(1,(now-t0)/dur);
+        el.textContent = fmt(r1k(from+(to-from)*(1-Math.pow(1-p,3))));
+        if(p<1) requestAnimationFrame(tick);
+      })(performance.now());
+    }
+    function renderEstimate(){
+      const c=compute();
+      animate($('lo'),prevLo,c.lo); animate($('hi'),prevHi,c.hi); animate($('mid'),prevMid,c.point);
+      prevLo=c.lo; prevHi=c.hi; prevMid=c.point;
+      $('cont').textContent = `${fmt(r1k(c.contLo))} – ${fmt(r1k(c.contHi))}`;
+      const rows=[];
+      rows.push(`<div class="erow"><div class="k">Base construction<small>${state.area} m² × ${fmt(c.rate)}/m²</small></div><div class="v">${fmt(r1k(c.base))}</div></div>`);
+      if(c.wet>0) rows.push(`<div class="erow"><div class="k">Wet-area loading<small>${c.extraBaths} extra bathroom${c.extraBaths>1?'s':''}</small></div><div class="v">+${fmt(r1k(c.wet))}</div></div>`);
+      if(c.complexAdd>0) rows.push(`<div class="erow"><div class="k">Site conditions<small>${COMPLEX_LABEL[state.complexity]} (×${c.cMult})</small></div><div class="v">+${fmt(r1k(c.complexAdd))}</div></div>`);
+      c.addonLines.forEach(a=>rows.push(`<div class="erow add"><div class="k">${a.label}</div><div class="v">+${fmt(a.cost)}</div></div>`));
+      $('breakdown').innerHTML = rows.join('');
+      const w = clamp(c.point/2000000*100, 5, 100);
+      $('scalebar').style.width = w+'%';
+      let tier='Small'; if(c.point>=1500000)tier='Major'; else if(c.point>=700000)tier='Large'; else if(c.point>=300000)tier='Medium';
+      $('tier').textContent = tier+' project';
+    }
+    function renderAll(){
+      setPressed('type',state.type); setPressed('bed',state.bed); setPressed('bath',state.bath);
+      setPressed('finish',state.finish); setPressed('complexity',state.complexity);
+      renderVisibility(); renderLevels(); renderAddons(); renderArea(); renderEstimate();
+    }
+    function setType(t){
+      state.type=t;
+      if(t==='new') state.level='single'; else if(t==='extension') state.level='ground';
+      if(t==='new'||t==='reno'){ state.area=BED_AREA[state.bed]; state.areaLocked=false; }
+      else if(t==='extension'){ state.area=40; state.areaLocked=true; }
+      else if(t==='commercial'){ state.area=200; state.areaLocked=true; }
+      state.addons = new Set([...state.addons].filter(id=>{ const a=ADDONS.find(x=>x.id===id); return a && a.types.includes(t); }));
+      renderAll();
+    }
+
+    /* events scoped to the estimate view */
+    document.addEventListener('click', e=>{
+      const chip = e.target.closest('#view-estimate .chip');
+      if(!chip) return;
+      if(chip.dataset.addon){
+        const id=chip.dataset.addon;
+        state.addons.has(id) ? state.addons.delete(id) : state.addons.add(id);
+        renderAddons(); renderEstimate(); return;
+      }
+      const group = chip.closest('[data-group]')?.dataset.group;
+      if(!group) return;
+      const val = chip.dataset.value;
+      if(group==='type'){ setType(val); return; }
+      if(group==='bed'){ state.bed=+val; if(state.type==='new'||state.type==='reno'){ state.area=BED_AREA[+val]; state.areaLocked=false; } }
+      else if(group==='bath'){ state.bath=+val; }
+      else if(group==='level'){ state.level=val; }
+      else if(group==='finish'){ state.finish=val; }
+      else if(group==='complexity'){ state.complexity=val; }
+      renderAll();
+    });
+    $('area').addEventListener('input', e=>{
+      state.area=+e.target.value; state.areaLocked=true;
+      $('areanum').textContent=state.area;
+      $('areamode').textContent='drag to set';
+      renderEstimate();
+    });
+    $('reset').addEventListener('click', ()=>{
+      Object.assign(state,{type:'new',bed:4,bath:2,level:'single',finish:'mid',complexity:'easy',area:240,areaLocked:false});
+      state.addons=new Set(); prevLo=prevHi=prevMid=0; renderAll();
+    });
+    /* hand-off: prefill contact form + route to contact */
+    $('cta').addEventListener('click', ()=>{
+      const c=compute();
+      const typeMap={new:'New home',reno:'Renovation',extension:'Extension / addition',commercial:'Commercial / fit-out'};
+      const sel=$('f-type');
+      if(sel){ const want=typeMap[state.type]; Array.from(sel.options).forEach(o=>{ if(o.text===want) sel.value=o.value; }); }
+      const msg=$('f-msg'); if(msg) msg.value = buildSummary(c);
+      location.hash = '#contact';
+    });
+
+    renderAll();
+  })();
+</script>
+</body>
+</html>
