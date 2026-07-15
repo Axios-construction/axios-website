@@ -6,14 +6,14 @@
 <title>Axios Construction — Sydney Building Studio</title>
 <meta name="description" content="Axios Construction — a Sydney building studio. New homes, renovations, extensions and commercial projects, delivered end to end by one licensed team.">
 <meta name="robots" content="index,follow">
-<meta name="theme-color" content="#0E0F11">
+<meta name="theme-color" content="#151514">
 <link rel="canonical" href="https://axiosconstruction.com.au/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Axios Construction — Sydney Building Studio">
 <meta property="og:description" content="New homes, renovations, extensions and commercial projects across Greater Sydney.">
 <meta property="og:url" content="https://axiosconstruction.com.au/">
 <meta name="twitter:card" content="summary">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23FFCB05'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-family='Arial' font-size='42' font-weight='800' fill='%230E0F11'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="assets/brand/axios-logo-black.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
@@ -35,17 +35,17 @@
 </script>
 <style>
   :root{
-    --ink:#0E0F11;
-    --panel:#16181B;
-    --steel:#23262B;
-    --steel2:#2E323A;--panel2:#1C1F23;
-    --line:rgba(237,234,227,.12);
-    --line-soft:rgba(237,234,227,.06);
-    --yellow:#FFCB05;
-    --yellow-dim:#d9ad04;
-    --wash:#EDEAE3;
-    --mute:#9aa1a8;
-    --slate:#7C8893;
+    --ink:#151514;
+    --panel:#1E1D1B;
+    --steel:#2D2B27;
+    --steel2:#3A352F;--panel2:#25231F;
+    --line:rgba(242,234,220,.14);
+    --line-soft:rgba(242,234,220,.07);
+    --yellow:#B77A4A;
+    --yellow-dim:#8F5E39;
+    --wash:#F2EADC;
+    --mute:#B6AA9B;
+    --slate:#918577;
     --display:'Bricolage Grotesque',sans-serif;
     --body:'Hanken Grotesk',sans-serif;
     --mono:'Space Mono',monospace;
@@ -91,10 +91,11 @@
   .curtain .cmark{font-family:var(--display);font-weight:800;font-size:clamp(2rem,7vw,4.5rem);color:var(--ink);letter-spacing:-.02em;opacity:0;transform:translateY(14px)}
 
   /* ---------- header ---------- */
-  header{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(14,15,17,.72);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-soft)}
+  header{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,21,20,.72);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-soft)}
   .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
   .brand{display:flex;align-items:center;gap:11px}
-  .brand .mk{width:34px;height:34px;background:var(--yellow);color:var(--ink);font-family:var(--display);font-weight:800;display:grid;place-items:center;font-size:1.15rem}
+  .brand .mk{width:42px;height:42px;display:grid;place-items:center}
+  .brand .mk img{width:100%;height:100%;object-fit:contain;display:block}
   .brand .bt{font-family:var(--display);font-weight:700;font-size:1.02rem;letter-spacing:.01em;line-height:1}
   .brand .bt small{display:block;font-family:var(--mono);font-size:.56rem;letter-spacing:.32em;color:var(--slate);margin-top:4px}
   .links{display:flex;gap:6px}
@@ -122,7 +123,7 @@
   .btn .arr{transition:transform .25s var(--ease)}
   .btn:hover .arr{transform:translateX(5px)}
   .btn-y{background:var(--yellow);color:var(--ink)}
-  .btn-y:hover{background:#ffd633}
+  .btn-y:hover{background:#C98C5A}
   .btn-o{background:transparent;color:var(--wash);border-color:var(--line)}
   .btn-o:hover{border-color:var(--yellow);color:var(--yellow)}
   .btn:active{transform:translateY(1px)}
@@ -189,9 +190,11 @@
   .card{display:block;border:1px solid var(--line);background:var(--panel);overflow:hidden;cursor:pointer;transition:transform .3s var(--ease),border-color .3s}
   .card:hover{transform:translateY(-5px);border-color:var(--yellow)}
   .card .vis{aspect-ratio:4/3;position:relative;overflow:hidden;background:var(--steel)}
-  .card .vis::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:34px 34px;transition:transform .5s var(--ease)}
+  .card .vis img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.94) contrast(1.02);transform:scale(1.005);transition:transform .6s var(--ease),filter .35s}
+  .card .vis::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,21,20,.03),rgba(21,21,20,.5));background-repeat:no-repeat;background-size:100% 100%;transition:transform .5s var(--ease)}
   .card:hover .vis::after{transform:scale(1.08)}
-  .card .vis .pn{position:absolute;right:16px;bottom:2px;font-family:var(--display);font-weight:800;font-size:5rem;color:rgba(255,203,5,.92);line-height:.8}
+  .card:hover .vis img{transform:scale(1.06);filter:saturate(.98) contrast(1.08)}
+  .card .vis .pn{position:absolute;right:16px;bottom:2px;font-family:var(--display);font-weight:800;font-size:5rem;color:rgba(183,122,74,.94);line-height:.8;z-index:1}
   .card .vis .tg{position:absolute;left:16px;top:16px;font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;background:var(--yellow);color:var(--ink);padding:5px 10px;font-weight:700}
   .card.v2 .vis{background:var(--steel2)}
   .card.v3 .vis{background:#34383f}
@@ -209,8 +212,10 @@
   .pd-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:end;margin-bottom:54px}
   .pd-hero h2{font-family:var(--display);font-weight:800;font-size:clamp(2.2rem,5.5vw,4.4rem);text-transform:uppercase;line-height:.96;letter-spacing:-.02em}
   .pd-vis{aspect-ratio:16/10;background:var(--steel);position:relative;overflow:hidden;border:1px solid var(--line)}
+  .pd-vis.has-photo{background-size:cover;background-position:center;filter:saturate(.92) contrast(1.03)}
   .pd-vis::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:40px 40px}
-  .pd-vis .bg{position:absolute;right:20px;bottom:-6px;font-family:var(--display);font-weight:800;font-size:9rem;color:rgba(255,203,5,.9);line-height:.8}
+  .pd-vis.has-photo::after{background:linear-gradient(180deg,rgba(21,21,20,0),rgba(21,21,20,.45))}
+  .pd-vis .bg{position:absolute;right:20px;bottom:-6px;font-family:var(--display);font-weight:800;font-size:9rem;color:rgba(183,122,74,.9);line-height:.8;z-index:1}
   .pd-spec{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:46px}
   .pd-spec .c{padding:24px 18px 24px 0;border-right:1px solid var(--line-soft)}
   .pd-spec .c:last-child{border-right:none}
@@ -222,6 +227,9 @@
   .pd-body ul{list-style:none;display:grid;gap:12px}
   .pd-body li{display:flex;gap:12px;align-items:baseline;font-size:.96rem;color:var(--wash);border-bottom:1px solid var(--line-soft);padding-bottom:12px}
   .pd-body li::before{content:"";width:7px;height:7px;background:var(--yellow);flex:none;transform:translateY(-1px)}
+  .pd-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:46px}
+  .pd-gallery:empty{display:none}
+  .pd-gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;border:1px solid var(--line);display:block;filter:saturate(.94) contrast(1.02)}
 
   /* ---------- team ---------- */
   .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
@@ -376,7 +384,7 @@
   .conting{font-family:var(--mono);font-size:.72rem;color:var(--mute);background:var(--panel2);border:1px solid var(--line-soft);padding:12px 14px;margin-bottom:18px}
   .conting b{color:var(--wash)}
   .cta{display:block;width:100%;text-align:center;background:var(--yellow);color:var(--ink);font-family:var(--mono);font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;padding:16px;border:0;cursor:pointer;transition:.2s}
-  .cta:hover{background:#ffd633}
+  .cta:hover{background:#C98C5A}
   .ereset{display:block;width:100%;text-align:center;background:none;border:1px solid var(--line);color:var(--mute);font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;padding:13px;margin-top:10px;cursor:pointer;transition:.2s}
   .ereset:hover{border-color:var(--slate);color:var(--wash)}
   .disclaim{font-family:var(--mono);font-size:.68rem;line-height:1.7;color:var(--slate);border-top:1px solid var(--line-soft);padding:22px 0 0;margin-top:40px;max-width:90ch}
@@ -405,7 +413,7 @@
   <div class="wrap">
     <nav class="nav">
       <a href="#home" class="brand" data-close aria-label="Axios home">
-        <span class="mk">A</span>
+        <span class="mk"><img src="assets/brand/axios-logo-white.png" alt="" aria-hidden="true"></span>
         <span class="bt">AXIOS<small>CONSTRUCTION · SYD</small></span>
       </a>
       <div class="links" id="links">
@@ -413,10 +421,9 @@
         <a href="#studio" data-close><span class="n">02</span>Studio</a>
         <a href="#services" data-close><span class="n">03</span>Build</a>
         <a href="#projects" data-close><span class="n">04</span>Projects</a>
-        <a href="#team" data-close><span class="n">05</span>Team</a>
-        <a href="#reviews" data-close><span class="n">06</span>Reviews</a>
-        <a href="#estimate" data-close><span class="n">07</span>Estimate</a>
-        <a href="#contact" data-close><span class="n">08</span>Contact</a>
+        <a href="#reviews" data-close><span class="n">05</span>Reviews</a>
+        <a href="#estimate" data-close><span class="n">06</span>Estimate</a>
+        <a href="#contact" data-close><span class="n">07</span>Contact</a>
       </div>
       <a href="#contact" class="navcta" data-close>Request a quote</a>
       <button class="burger" id="burger" aria-expanded="false" aria-controls="links">Menu</button>
@@ -524,7 +531,7 @@
         <span class="kick"><span class="ix">[ 04 ]</span> Selected work</span>
         <h2 style="margin-top:18px">Built across<br>the <em>basin.</em></h2>
       </div>
-      <p class="lede">Our verified project portfolio is being prepared. Real project details and photography will be published here with client approval.</p>
+      <p class="lede">A growing portfolio of approved residential and commercial work across Greater Sydney, published with project details and approved imagery.</p>
     </div>
     <div class="pgrid" id="pgrid"><!-- cards injected --></div>
   </div></div>
@@ -547,7 +554,7 @@
       <div class="c"><span>Scope</span><strong id="pd-scope">—</strong></div>
       <div class="c"><span>Year</span><strong id="pd-year">—</strong></div>
       <div class="c"><span>Duration</span><strong id="pd-dur">—</strong></div>
-      <div class="c"><span>Value</span><strong id="pd-val">—</strong></div>
+      <div class="c"><span>Scale</span><strong id="pd-val">—</strong></div>
     </div>
     <div class="pd-body st" style="--i:3">
       <div id="pd-summary"></div>
@@ -556,7 +563,8 @@
         <ul id="pd-items"></ul>
       </div>
     </div>
-    <div class="st" style="--i:4;margin-top:50px">
+    <div class="pd-gallery st" style="--i:4" id="pd-gallery"></div>
+    <div class="st" style="--i:5;margin-top:50px">
       <a href="#contact" class="btn btn-y" data-close>Start a project like this <span class="arr">→</span></a>
     </div>
   </div></div>
@@ -769,11 +777,11 @@
   <div class="wrap">
     <div class="foot">
       <div class="fb">
-        <div class="name">AXIOS<em>.</em></div>
+        <div class="name"><img src="assets/brand/axios-logo-white.png" alt="" style="width:42px;height:42px;object-fit:contain;vertical-align:middle;margin-right:10px">AXIOS<em>.</em></div>
         <p>Construction services across Greater Sydney for new homes, renovations, extensions and commercial projects.</p>
       </div>
       <div><h4>Build</h4><a data-link="#services">New homes</a><a data-link="#services">Renovations</a><a data-link="#services">Extensions</a><a data-link="#services">Commercial</a></div>
-      <div><h4>Studio</h4><a data-link="#studio">About</a><a data-link="#projects">Projects</a><a data-link="#team">Team</a><a data-link="#reviews">Reviews</a></div>
+      <div><h4>Studio</h4><a data-link="#studio">About</a><a data-link="#projects">Projects</a><a data-link="#reviews">Reviews</a></div>
       <div><h4>Get in touch</h4><a href="tel:+61417958871">0417 958 871</a><a href="mailto:info@axiosconstruction.com.au">info@axiosconstruction.com.au</a><a data-link="#contact">Request a quote</a></div>
     </div>
     <div class="fbot">
@@ -889,16 +897,106 @@
   else if(analyticsAllowed()) loadAnalytics();
 
   /* ---------- project data ---------- */
-  const PROJECTS = {};
+  const PROJECTS = {
+    'haven-northbridge': {
+      title: 'Haven Northbridge',
+      tag: 'Boutique apartments',
+      loc: 'Northbridge · NSW',
+      type: 'New build · Boutique apartments',
+      scope: 'Site supervision to handover',
+      year: '2023–2024',
+      dur: 'Approx. 18 months',
+      val: '11 premium residences',
+      pn: '01',
+      v: 'v1',
+      image: 'assets/projects/haven-northbridge/card.jpg',
+      detailImage: 'assets/projects/haven-northbridge/hero.jpg',
+      gallery: [
+        'assets/projects/haven-northbridge/gallery-01.jpg',
+        'assets/projects/haven-northbridge/gallery-02.jpg',
+        'assets/projects/haven-northbridge/card.jpg'
+      ],
+      summary: [
+        'Haven Northbridge is a premium boutique residential project set within the natural landscape of Northbridge, close to Sailors Bay Creek and surrounded by mature trees and established greenery.',
+        'The development delivers 11 spacious, private and carefully detailed residences across four residential levels, with basement parking, shared areas, landscaping, lift access and integrated building services.',
+        'Tianlong Yin’s role focused on site supervision, construction coordination, quality control, programme management, subcontractor coordination, inspections and delivery control, helping maintain the standards expected of a high-end residential project.'
+      ],
+      items: [
+        'Low-density boutique apartment development with 11 residences',
+        'Four residential levels with basement parking and lift access',
+        'Site supervision, trade coordination and programme management',
+        'Quality control across architectural details, services and finishes',
+        'Coordination of subcontractors, inspections and handover requirements',
+        'Landscape integration beside the Sailors Bay Creek natural setting',
+        'Delivery focus on craftsmanship, durability, safety and resident experience'
+      ]
+    },
+    'bell-avenue-lindfield': {
+      title: '1 Bell Avenue Lindfield',
+      tag: 'Custom residence',
+      loc: 'Lindfield · Sydney Upper North Shore · Ku-ring-gai Council',
+      type: 'New home · Knockdown rebuild',
+      scope: 'Demolition to OC',
+      year: '2026–2027',
+      dur: 'Approx. 15 months',
+      val: 'Approx. 327m² approved floor area',
+      pn: '02',
+      v: 'v2',
+      image: 'assets/projects/lindfield-bell-avenue/card.jpg',
+      detailImage: 'assets/projects/lindfield-bell-avenue/hero.jpg',
+      summary: [
+        'Located on Sydney’s Upper North Shore, this Lindfield project is a high-end custom home delivered from the demolition of the existing dwelling through to final occupation certificate.',
+        'The approved design combines a multi-level layout, cast-in-place reinforced concrete works, suspended slabs and careful management of a sloping site to create a contemporary family residence with curved architectural forms, generous glazing and refined exterior finishes.',
+        'Axios Construction is responsible for end-to-end project management, construction coordination, quality control and delivery in accordance with the approved architectural, structural, stormwater and BASIX documentation.'
+      ],
+      items: [
+        'Demolition of the existing dwelling and associated structures',
+        'Site clearing, excavation, groundworks and reinforced concrete foundations',
+        'Concrete walls, ground slab and suspended slab structure',
+        'Retaining works and construction sequencing for an irregular sloping site',
+        'Walling, roofing, windows, doors, services rough-in and fit-off',
+        'Interior fit-out, external works, landscaping and final OC handover',
+        'Stormwater management including a rainwater collection system of at least 4,000L'
+      ]
+    },
+    'bellevue-parade-allawah': {
+      title: '134 Bellevue Parade Allawah',
+      tag: 'Dual occupancy',
+      loc: 'Allawah · NSW 2218 · Sydney South',
+      type: 'New home · Dual occupancy',
+      scope: 'DA design to construction planning',
+      year: '2027–2028',
+      dur: 'Estimated 14–18 months',
+      val: 'Approx. 436.6m² total floor area',
+      pn: '03',
+      v: 'v3',
+      image: 'assets/projects/allawah-bellevue-parade/card.jpg',
+      detailImage: 'assets/projects/allawah-bellevue-parade/hero.jpg',
+      summary: [
+        'Located in Allawah in Sydney’s south, this project proposes the demolition of an existing single-storey dwelling and the construction of a modern two-storey side-by-side dual occupancy.',
+        'The design includes two independent residences with a largely symmetrical layout. Each dwelling provides its own garage, living, kitchen and dining areas, guest room, laundry, family area, four bedrooms, master suite, balcony, private courtyard and outdoor living space.',
+        'The project is currently in DA design and consultant coordination. Axios Construction is involved in early design coordination, consultant management and construction planning, with attention to site levels, flood planning requirements, natural light, private open space and buildability.'
+      ],
+      items: [
+        'Demolition of the existing single-storey residence',
+        'Two independent four-bedroom family dwellings in a side-by-side dual occupancy layout',
+        'Private garages, master suites, family areas, balconies and courtyards for each dwelling',
+        'Earthworks, structural works, drainage, driveway and external works planning',
+        'Approx. 794m² site area with approx. 278m² retained landscape area',
+        'Design coordination around slope, flood planning levels and floor level strategy',
+        'Consultant coordination and construction planning by Axios Construction'
+      ]
+    }
+  };
   // Add only verified projects with approved photography before publishing them here.
-  const ORDER = [];
+  const ORDER = ['haven-northbridge','bell-avenue-lindfield','bellevue-parade-allawah'];
 
   /* build project cards */
   const pgrid = document.getElementById('pgrid');
   pgrid.innerHTML = ORDER.length ? ORDER.map((id,idx)=>{
     const p = PROJECTS[id];
     return `<a class="card ${p.v} st" style="--i:${idx+1}" data-link="#project/${id}">
-      <div class="vis"><span class="tg">${p.tag}</span><span class="pn">${p.pn}</span></div>
+      <div class="vis">${p.image ? `<img src="${p.image}" alt="${p.title} project image" loading="lazy">` : ''}<span class="tg">${p.tag}</span><span class="pn">${p.pn}</span></div>
       <div class="ci"><h3>${p.title}</h3><div class="lc">${p.loc}</div><div class="go">Open case study →</div></div>
     </a>`;
   }).join('') : `<div class="st" style="--i:1;grid-column:1/-1;border:1px solid var(--line);padding:42px;background:var(--panel)">
@@ -921,8 +1019,11 @@
     document.getElementById('pd-pn').textContent = p.pn;
     document.getElementById('pd-summary').innerHTML = p.summary.map(s=>`<p>${s}</p>`).join('');
     document.getElementById('pd-items').innerHTML = p.items.map(s=>`<li>${s}</li>`).join('');
+    const gallery = document.getElementById('pd-gallery');
+    gallery.innerHTML = (p.gallery || []).map((src, idx)=>`<img src="${src}" alt="${p.title} view ${idx + 1}" loading="lazy">`).join('');
     const vis = document.getElementById('pd-vis');
-    vis.className = 'pd-vis ' + p.v;
+    vis.className = 'pd-vis ' + p.v + (p.detailImage ? ' has-photo' : '');
+    vis.style.backgroundImage = p.detailImage ? `url('${p.detailImage}')` : '';
   }
 
   /* ---------- view router ---------- */
