@@ -277,7 +277,9 @@
   .form-ok.show{display:block}
 
   /* ---------- footer ---------- */
-  footer{border-top:1px solid var(--line);padding:60px 0 34px;margin-top:40px}
+  footer{position:relative;overflow:hidden;border-top:1px solid var(--line);padding:60px 0 34px;margin-top:40px}
+  footer::before{content:"";position:absolute;right:clamp(-70px,-4vw,-30px);bottom:clamp(-120px,-9vw,-70px);width:clamp(260px,34vw,540px);aspect-ratio:1;background:url("assets/brand/axios-logo-mark.png") center/contain no-repeat;opacity:.075;pointer-events:none}
+  footer .wrap{position:relative;z-index:1}
   .foot{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:36px;padding-bottom:44px;border-bottom:1px solid var(--line-soft)}
   .foot .fb .name{font-family:var(--display);font-weight:800;font-size:1.5rem}
   .foot .fb .name em{color:var(--yellow);font-style:normal}
