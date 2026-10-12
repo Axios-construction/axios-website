@@ -267,7 +267,8 @@
   .score-stars{font-size:1.25rem;letter-spacing:.14em;margin:20px 0 10px}
   .score-count{font-family:var(--mono);font-size:.7rem;line-height:1.6;text-transform:uppercase;letter-spacing:.08em}
   .review-card{padding:clamp(34px,6vw,72px);display:flex;flex-direction:column;justify-content:center}
-  .review-quote{font-family:var(--display);font-size:clamp(2rem,4.5vw,4.2rem);font-weight:700;line-height:1.02;letter-spacing:-.035em;max-width:18ch}
+  .review-quote{font-family:var(--display);font-size:clamp(1.8rem,3.4vw,3.1rem);font-weight:700;line-height:1.04;letter-spacing:-.035em;max-width:20ch}
+  .review-item + .review-item{border-top:1px solid var(--line);margin-top:34px;padding-top:34px}
   .review-quote em{color:var(--yellow);font-style:normal}
   .review-by{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);margin-top:28px}
   .review-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
@@ -477,7 +478,7 @@
         <a href="#projects" class="btn btn-y" data-close>View projects <span class="arr">→</span></a>
         <a href="#contact" class="btn btn-o" data-close>Start a build</a>
       </div>
-      <a href="#reviews" class="google-proof st" style="--i:4" data-close aria-label="View Axios Construction Google reviews"><span class="stars" aria-hidden="true">★★★★★</span><span>5.0 on Google · 1 review</span></a>
+      <a href="#reviews" class="google-proof st" style="--i:4" data-close aria-label="View Axios Construction Google reviews"><span class="stars" aria-hidden="true">★★★★★</span><span>5.0 on Google · 2 reviews</span></a>
       <div class="marquee st" style="--i:5" aria-hidden="true">
         <div class="track">
           <span>New Homes</span><span class="sep">◆</span><span>Renovations</span><span class="sep">◆</span><span>Extensions</span><span class="sep">◆</span><span>Commercial Fit-outs</span><span class="sep">◆</span><span>Duplexes</span><span class="sep">◆</span>
@@ -630,12 +631,18 @@
         <div>
           <div class="score-number">5.0</div>
           <div class="score-stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <div class="score-count">1 public review<br>Checked 2 July 2026</div>
+          <div class="score-count">2 public reviews<br>Checked 12 October 2026</div>
         </div>
       </div>
       <article class="review-card">
-        <blockquote class="review-quote">“The entire process was <em>smooth, professional, and stress-free.</em>”</blockquote>
-        <p class="review-by">William Wu · 5-star Google review</p>
+        <div class="review-item">
+          <blockquote class="review-quote">“Professional, knowledgeable and <em>always willing to go the extra mile.</em>”</blockquote>
+          <p class="review-by">Monica Liu · 5-star Google review</p>
+        </div>
+        <div class="review-item">
+          <blockquote class="review-quote">“The entire process was <em>smooth, professional, and stress-free.</em>”</blockquote>
+          <p class="review-by">William Wu · 5-star Google review</p>
+        </div>
         <div class="review-actions">
           <a class="btn btn-y" href="https://www.google.com/maps?cid=7227826619345682489" target="_blank" rel="noopener noreferrer">Read on Google <span class="arr">↗</span></a>
           <a class="btn btn-o" href="https://search.google.com/local/writereview?placeid=ChIJPayXOtehsy0ROUA2AARmTmQ" target="_blank" rel="noopener noreferrer">Leave a review <span class="arr">↗</span></a>
