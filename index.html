@@ -267,8 +267,19 @@
   .score-stars{font-size:1.25rem;letter-spacing:.14em;margin:20px 0 10px}
   .score-count{font-family:var(--mono);font-size:.7rem;line-height:1.6;text-transform:uppercase;letter-spacing:.08em}
   .review-card{padding:clamp(34px,6vw,72px);display:flex;flex-direction:column;justify-content:center}
-  .review-quote{font-family:var(--display);font-size:clamp(1.8rem,3.4vw,3.1rem);font-weight:700;line-height:1.04;letter-spacing:-.035em;max-width:20ch}
-  .review-item + .review-item{border-top:1px solid var(--line);margin-top:34px;padding-top:34px}
+  .review-quote{font-family:var(--display);font-size:clamp(1.7rem,3.2vw,2.9rem);font-weight:700;line-height:1.04;letter-spacing:-.035em;max-width:20ch}
+  .rv-track{display:grid}
+  .rv-slide{grid-area:1/1;align-self:center;margin:0;opacity:0;visibility:hidden;transform:translateX(18px);transition:opacity .5s var(--ease),transform .5s var(--ease),visibility 0s .5s}
+  .rv-slide.is-active{opacity:1;visibility:visible;transform:none;transition:opacity .5s var(--ease),transform .5s var(--ease),visibility 0s}
+  .rv-full{font-family:var(--body);font-size:1rem;line-height:1.65;color:var(--mute);white-space:pre-line;max-width:62ch;margin-top:22px}
+  .rv-controls{display:flex;align-items:center;gap:14px;margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+  .rv-btn{background:none;border:1px solid var(--line);color:var(--wash);font-family:var(--mono);font-size:1rem;padding:8px 14px;cursor:pointer;transition:border-color .2s,color .2s}
+  .rv-btn:hover,.rv-btn:focus-visible{border-color:var(--yellow);color:var(--yellow)}
+  .rv-dots{display:flex;gap:8px}
+  .rv-dot{width:9px;height:9px;padding:0;border:1px solid var(--slate);background:none;cursor:pointer}
+  .rv-dot[aria-current="true"]{background:var(--yellow);border-color:var(--yellow)}
+  .rv-count{margin-left:auto;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;color:var(--slate)}
+  @media (prefers-reduced-motion: reduce){.rv-slide,.rv-slide.is-active{transition:none;transform:none}}
   .review-quote em{color:var(--yellow);font-style:normal}
   .review-by{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);margin-top:28px}
   .review-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
@@ -478,7 +489,7 @@
         <a href="#projects" class="btn btn-y" data-close>View projects <span class="arr">→</span></a>
         <a href="#contact" class="btn btn-o" data-close>Start a build</a>
       </div>
-      <a href="#reviews" class="google-proof st" style="--i:4" data-close aria-label="View Axios Construction Google reviews"><span class="stars" aria-hidden="true">★★★★★</span><span>5.0 on Google · 2 reviews</span></a>
+      <a href="#reviews" class="google-proof st" style="--i:4" data-close aria-label="View Axios Construction Google reviews"><span class="stars" aria-hidden="true">★★★★★</span><span>5.0 on Google · 4 reviews</span></a>
       <div class="marquee st" style="--i:5" aria-hidden="true">
         <div class="track">
           <span>New Homes</span><span class="sep">◆</span><span>Renovations</span><span class="sep">◆</span><span>Extensions</span><span class="sep">◆</span><span>Commercial Fit-outs</span><span class="sep">◆</span><span>Duplexes</span><span class="sep">◆</span>
@@ -631,17 +642,47 @@
         <div>
           <div class="score-number">5.0</div>
           <div class="score-stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <div class="score-count">2 public reviews<br>Checked 12 October 2026</div>
+          <div class="score-count">4 public reviews<br>Checked 29 October 2026</div>
         </div>
       </div>
       <article class="review-card">
-        <div class="review-item">
-          <blockquote class="review-quote">“Professional, knowledgeable and <em>always willing to go the extra mile.</em>”</blockquote>
-          <p class="review-by">Monica Liu · 5-star Google review</p>
-        </div>
-        <div class="review-item">
-          <blockquote class="review-quote">“The entire process was <em>smooth, professional, and stress-free.</em>”</blockquote>
-          <p class="review-by">William Wu · 5-star Google review</p>
+        <div class="rv" id="rv" aria-roledescription="carousel" aria-label="Google reviews">
+          <div class="rv-track" id="rvTrack" aria-live="off">
+            <figure class="rv-slide" aria-roledescription="slide" aria-label="1 of 4">
+              <blockquote class="review-quote">“Would highly recommend to others looking for a <em>detail orientated builder.</em>”</blockquote>
+              <p class="rv-full">We were pleased with the outcome of our residential apartment project. Would highly recommend to others looking for a detail orientated builder.</p>
+              <figcaption class="review-by">Luke Kim · 5-star Google review</figcaption>
+            </figure>
+            <figure class="rv-slide" aria-roledescription="slide" aria-label="2 of 4">
+              <blockquote class="review-quote">“Long is a great builder, <em>honest and reliable.</em>”</blockquote>
+              <p class="rv-full">Long is a great builder, honest and reliable. Very happy with the new home he built for me. He always use good tradesman with top workmanship, never cut corners, also response fast to minor defects and emergency repairs. I will recommend him to anyone who want to build their own dream home.</p>
+              <figcaption class="review-by">Jordan Gao · 5-star Google review</figcaption>
+            </figure>
+            <figure class="rv-slide" aria-roledescription="slide" aria-label="3 of 4">
+              <blockquote class="review-quote">“Professional, knowledgeable and <em>always willing to go the extra mile.</em>”</blockquote>
+              <p class="rv-full">I had the pleasure of working with Tianlong on a previous construction project and had a very positive experience.
+
+He was professional, knowledgeable and always willing to go the extra mile to make sure everything was done properly. His attention to detail, communication and ability to manage challenges throughout the building process really stood out.
+
+I’m pleased to see him running his own company, Axios Construction, and would happily recommend him to anyone looking for an experienced and reliable builder.</p>
+              <figcaption class="review-by">Monica Liu · 5-star Google review</figcaption>
+            </figure>
+            <figure class="rv-slide" aria-roledescription="slide" aria-label="4 of 4">
+              <blockquote class="review-quote">“The entire process was <em>smooth, professional, and stress-free.</em>”</blockquote>
+              <p class="rv-full">I recently had the pleasure of working with Tianlong who truly exceeded my expectations. From start to finish, the entire process was smooth, professional, and stress-free. The attention to detail, quality of workmanship, and clear communication throughout the project really stood out.
+
+He was always punctual, kept the site clean, and were transparent about timelines and costs—no surprises along the way. Most importantly, the final result turned out even better than I had imagined.
+
+I wouldn’t hesitate to recommend him to anyone looking for a reliable and skilled builder. It’s rare to find someone who delivers on both quality and trust like this.</p>
+              <figcaption class="review-by">William Wu · 5-star Google review</figcaption>
+            </figure>
+          </div>
+          <div class="rv-controls">
+            <button class="rv-btn" id="rvPrev" type="button" aria-label="Previous review">←</button>
+            <div class="rv-dots" id="rvDots"></div>
+            <button class="rv-btn" id="rvNext" type="button" aria-label="Next review">→</button>
+            <span class="rv-count" id="rvCount"></span>
+          </div>
         </div>
         <div class="review-actions">
           <a class="btn btn-y" href="https://www.google.com/maps?cid=7227826619345682489" target="_blank" rel="noopener noreferrer">Read on Google <span class="arr">↗</span></a>
@@ -1170,6 +1211,59 @@
     else if(e.key === 'ArrowRight') lbShow(lbIndex + 1);
   });
   window.addEventListener('hashchange', lbClose);
+
+  /* reviews carousel: auto-advances, pauses on hover/focus/touch */
+  (function(){
+    const rv = document.getElementById('rv');
+    if(!rv) return;
+    const slides = Array.from(rv.querySelectorAll('.rv-slide'));
+    const dots = document.getElementById('rvDots');
+    const count = document.getElementById('rvCount');
+    const autoplay = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let idx = 0, timer = null, paused = false;
+
+    dots.innerHTML = slides.map((_, i)=>`<button class="rv-dot" type="button" aria-label="Show review ${i + 1}"></button>`).join('');
+    const dotBtns = Array.from(dots.children);
+
+    // longer reviews stay up longer so they can be read in full
+    const dwell = s => 6000 + s.querySelector('.rv-full').textContent.split(/\s+/).length * 200;
+
+    function show(i){
+      idx = (i + slides.length) % slides.length;
+      slides.forEach((s, n)=>{ s.classList.toggle('is-active', n === idx); s.setAttribute('aria-hidden', String(n !== idx)); });
+      dotBtns.forEach((d, n)=> d.setAttribute('aria-current', String(n === idx)));
+      count.textContent = (idx + 1) + ' / ' + slides.length;
+      schedule();
+    }
+    function schedule(){
+      clearTimeout(timer);
+      if(autoplay && !paused && !document.hidden) timer = setTimeout(()=> show(idx + 1), dwell(slides[idx]));
+    }
+    function pause(){ paused = true; clearTimeout(timer); }
+    function resume(){ paused = false; schedule(); }
+
+    document.getElementById('rvPrev').addEventListener('click', ()=> show(idx - 1));
+    document.getElementById('rvNext').addEventListener('click', ()=> show(idx + 1));
+    dotBtns.forEach((d, n)=> d.addEventListener('click', ()=> show(n)));
+    rv.addEventListener('mouseenter', pause);
+    rv.addEventListener('mouseleave', resume);
+    rv.addEventListener('focusin', pause);
+    rv.addEventListener('focusout', e=>{ if(!rv.contains(e.relatedTarget)) resume(); });
+    rv.addEventListener('keydown', e=>{
+      if(e.key === 'ArrowLeft') show(idx - 1);
+      else if(e.key === 'ArrowRight') show(idx + 1);
+    });
+    let x0 = null;
+    rv.addEventListener('touchstart', e=>{ x0 = e.touches[0].clientX; pause(); }, {passive:true});
+    rv.addEventListener('touchend', e=>{
+      const dx = e.changedTouches[0].clientX - (x0 ?? e.changedTouches[0].clientX);
+      x0 = null;
+      paused = false;
+      if(Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1)); else schedule();
+    }, {passive:true});
+    document.addEventListener('visibilitychange', schedule);
+    show(0);
+  })();
 
   /* mobile menu */
   const burger = document.getElementById('burger');
